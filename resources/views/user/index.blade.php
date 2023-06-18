@@ -104,7 +104,7 @@
                                 });
 
                             axios({
-                                url: 'http://127.0.0.1:8000/role',
+                                url: '/role',
                             }).then(function(response) {
                                 response.forEach(element => {
                                     select.append('<option value="' + element.id + '">' + element.name + '</option>');
