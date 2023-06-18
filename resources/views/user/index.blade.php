@@ -4,28 +4,30 @@
 
 <div class="container">
     <h1>User</h1>
-    <table id="user" class="display" style="width:100%">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>User</th>
-                <th>Created</th>
-                <th>Updated</th>
-                <th>Role</th>
-                <th class="text-center">Action</th>
-            </tr>
-        </thead>
-        <tfoot>
-            <tr>
-                <th>Id</th>
-                <th>User</th>
-                <th>Created</th>
-                <th>Updated</th>
-                <th>Role</th>
-                <th class="text-center">Action</th>
-            </tr>
-        </tfoot>
-    </table>
+    <div class="table-responsive">
+        <table id="user" class="display" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>User</th>
+                    <th>Created</th>
+                    <th>Updated</th>
+                    <th>Role</th>
+                    <th class="text-center">Action</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th>Id</th>
+                    <th>User</th>
+                    <th>Created</th>
+                    <th>Updated</th>
+                    <th>Role</th>
+                    <th class="text-center">Action</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
 </div>
 
 @endsection

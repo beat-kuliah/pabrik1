@@ -8,22 +8,24 @@
     </button>
     <h1>Barang</h1>
     <br><br>
-    <table id="barang" class="display" style="width:100%">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Kode</th>
-                <th>Nama</th>
-                <th>Stok Awal</th>
-                <th>Stok Akhir</th>
-                <th>Harga</th>
-                <th>Vendor</th>
-                <th>Gudang</th>
-                <th class="text-center">Action</th>
-            </tr>
-        </thead>
-        <tfoot>
-    </table>
+    <div class="table-responsive">
+        <table id="barang" class="display" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Kode</th>
+                    <th>Nama</th>
+                    <th>Stok Awal</th>
+                    <th>Stok Akhir</th>
+                    <th>Harga</th>
+                    <th>Vendor</th>
+                    <th>Gudang</th>
+                    <th class="text-center">Action</th>
+                </tr>
+            </thead>
+            <tfoot>
+        </table>
+    </div>
 </div>
 
 @include('barang.create')

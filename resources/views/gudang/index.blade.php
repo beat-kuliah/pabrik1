@@ -8,28 +8,30 @@
     </button>
     <h1>Gudang</h1>
     <br><br>
-    <table id="gudang" class="display" style="width:100%">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Kode</th>
-                <th>Nama</th>
-                <th>Created</th>
-                <th>Updated</th>
-                <th class="text-center">Action</th>
-            </tr>
-        </thead>
-        <tfoot>
-            <tr>
-                <th>Id</th>
-                <th>Kode</th>
-                <th>Nama</th>
-                <th>Created</th>
-                <th>Updated</th>
-                <th class="text-center">Action</th>
-            </tr>
-        </tfoot>
-    </table>
+    <div class="table-responsive">
+        <table id="gudang" class="display" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Kode</th>
+                    <th>Nama</th>
+                    <th>Created</th>
+                    <th>Updated</th>
+                    <th class="text-center">Action</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th>Id</th>
+                    <th>Kode</th>
+                    <th>Nama</th>
+                    <th>Created</th>
+                    <th>Updated</th>
+                    <th class="text-center">Action</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
 </div>
 
 @include('gudang.create')
