@@ -3,9 +3,9 @@
 @section('content')
 
 <div class="container">
-    <button style="float: right; margin-top: 50px;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createBarang">
+    <!-- <button style="float: right; margin-top: 50px;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createBarang">
         Tambah Data
-    </button>
+    </button> -->
     <h1>Barang</h1>
     <br><br>
     <div class="table-responsive">
@@ -136,22 +136,6 @@
         var result = fixDate.getDate() + ' ' + $bulan[fixDate.getMonth()] + ' ' + fixDate.getFullYear() + ' ' + fixDate.getHours() + ':' + fixDate.getMinutes();
 
         return result;
-    }
-
-    function tambahVendor() {
-        var formData = new FormData(document.getElementById("formGudang"));
-        axios({
-            method: 'post',
-            url: '/gudang',
-            data: formData
-        }).then(function(response) {
-            if (response.data.status == 200)
-                window.location.href = '/gudang';
-            else
-                alert('Gagal - Ada kode yang sama')
-        }).catch(function(error) {
-            alert('gagal');
-        })
     }
 
     function tambahBarang() {
