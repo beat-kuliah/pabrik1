@@ -65,6 +65,20 @@ class BarangController extends Controller
         return $data;
     }
 
+    public function findOne($id)
+    {
+        $barang = Barang::find($id);
+
+        return $barang;
+    }
+
+    public function getAll()
+    {
+        $barang = Barang::all();
+
+        return $barang;
+    }
+
     public function datatables(Request $request)
     {
         $draw = (int)$request->get('draw');

@@ -20,6 +20,6 @@ class Penjualan extends Model
 
     public function getBarangAttribute()
     {
-        return Barang::where('kode', '==', $this->kode_barang)->get();
+        return Barang::find($this->id);
     }
 }

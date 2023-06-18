@@ -52,6 +52,8 @@ Route::controller(VendorController::class)->middleware('auth', 'role:ADMIN')->gr
 
 Route::controller(PenjualanController::class)->middleware('auth', 'role:ADMIN')->group(function () {
     Route::get('/penjualan', 'index')->name('penjualan');
+    Route::post('/penjualan', 'store');
+    Route::get('/penjualan/datatables', 'datatables');
 });
 
 Route::controller(BarangController::class)->middleware('auth', 'role:ADMIN')->group(function () {
@@ -59,6 +61,6 @@ Route::controller(BarangController::class)->middleware('auth', 'role:ADMIN')->gr
     Route::post('/barang', 'store');
     Route::get('/barang/datatables', 'datatables');
     Route::post('/barang/update-stok/{id}', 'updateStok');
+    Route::get('/barang/find/{id}', 'findOne');
+    Route::get('/barang/all', 'getAll');
 });
-
-Route::controller();
