@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('gudang', function (Blueprint $table) {
             $table->id();
+            $table->text('kode')->unique();
             $table->string('nama');
-            $table->integer('stok');
             $table->timestamps();
         });
     }

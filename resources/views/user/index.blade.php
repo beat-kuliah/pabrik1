@@ -4,7 +4,7 @@
 
 <div class="container">
     <h1>User</h1>
-    <table id="test" class="display" style="width:100%">
+    <table id="user" class="display" style="width:100%">
         <thead>
             <tr>
                 <th>Id</th>
@@ -34,7 +34,7 @@
 
 <script>
     $(document).ready(function() {
-        $('#test').DataTable({
+        $('#user').DataTable({
             processing: true,
             serverSide: true,
             ajax: '/user/datatables',
@@ -116,14 +116,6 @@
             },
         });
     });
-
-    function fixDate(val) {
-        var fixDate = new Date(val);
-        $bulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-        var result = fixDate.getDate() + ' ' + $bulan[fixDate.getMonth()] + ' ' + fixDate.getFullYear() + ' ' + fixDate.getHours() + ':' + fixDate.getMinutes();
-
-        return result;
-    }
 
     function editUser(val) {
         axios.get('/user/' + val + '/update')

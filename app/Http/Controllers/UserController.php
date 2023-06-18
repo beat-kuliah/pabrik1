@@ -90,10 +90,11 @@ class UserController extends Controller
 
         // Total records
         $totalRecords = User::select('count(*) as allcount')->count();
-        $totalRecordswithFilter = User::select('count(*) as allcount')->where('username', 'like', '%' . $searchValue . '%')->count();
+        $totalRecordswithFilter = 0;
 
         // Fetch records
         if ($searchRole == null) {
+            $totalRecordswithFilter = User::select('count(*) as allcount')->where('username', 'like', '%' . $searchValue . '%')->count();
             $records = User::orderBy($columnName, $columnSortOrder)
                 ->where('users.username', 'like', '%' . $searchValue . '%')
                 ->select('users.*', 'roles.name as role')
@@ -103,8 +104,8 @@ class UserController extends Controller
                 ->take($rowperpage)
                 ->get();
         } else {
-
             $searchRoleValue = substr($searchRole, 1, strlen($searchRole) - 2);
+            $totalRecordswithFilter = User::select('count(*) as allcount')->where('username', 'like', '%' . $searchValue . '%')->where('model_has_roles.role_id', 'like', $searchRoleValue)->leftjoin('model_has_roles', 'model_has_roles.model_id', '=', 'users.id')->count();
             $records = User::orderBy($columnName, $columnSortOrder)
                 ->where('users.username', 'like', '%' . $searchValue . '%')
                 ->where('model_has_roles.role_id', 'like', $searchRoleValue)

@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('penjualan', function (Blueprint $table) {
             $table->id();
-            $table->date('tanggal_penjualan');
-            $table->integer('total_barang');
+            $table->integer('barang_id');
+            $table->date('tanggal');
+            $table->integer('terjual');
             $table->timestamps();
         });
     }
