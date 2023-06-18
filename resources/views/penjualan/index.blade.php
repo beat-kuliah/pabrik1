@@ -2,8 +2,8 @@
 
 @section('content')
 
-<!-- <div class="container">
-    <button style="float: right; margin-top: 50px;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createVendor">
+<div class="container">
+    <button style="float: right; margin-top: 50px;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createPenjualan">
         Tambah Data
     </button>
     <h1>Penjualan</h1>
@@ -32,7 +32,7 @@
     </table>
 </div>
 
-@include('vendor.create') -->
+@include('vendor.create')
 
 @endsection
 
