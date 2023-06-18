@@ -3,9 +3,9 @@
 @section('content')
 
 <div class="container">
-    <!-- <button style="float: right; margin-top: 50px;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createBarang">
+    <button style="float: right; margin-top: 50px;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createBarang">
         Tambah Data
-    </button> -->
+    </button>
     <h1>Barang</h1>
     <br><br>
     <div class="table-responsive">

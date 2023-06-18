@@ -2,7 +2,7 @@
 
 @section('content')
 
-<div class="container">
+<!-- <div class="container">
     <button style="float: right; margin-top: 50px;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createVendor">
         Tambah Data
     </button>
@@ -32,7 +32,7 @@
     </table>
 </div>
 
-@include('vendor.create')
+@include('vendor.create') -->
 
 @endsection
 
