@@ -106,7 +106,7 @@
                             axios({
                                 url: '/role',
                             }).then(function(response) {
-                                response.forEach(element => {
+                                response.data.forEach(element => {
                                     select.append('<option value="' + element.id + '">' + element.name + '</option>');
                                 });
                                 // select.append('<option value="' + d + '">' + d + '</option>');
