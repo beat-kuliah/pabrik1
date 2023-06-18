@@ -103,9 +103,9 @@
                                     column.search(val ? '^' + val + '$' : '', true, false).draw();
                                 });
 
-                            $.ajax({
+                            axios({
                                 url: 'http://127.0.0.1:8000/role',
-                            }).done(function(response) {
+                            }).then(function(response) {
                                 response.forEach(element => {
                                     select.append('<option value="' + element.id + '">' + element.name + '</option>');
                                 });
