@@ -46,6 +46,7 @@
     var harga = 0;
     var stok_max = 0;
     var terjual = 0;
+    var total = 0;
 
     $(document).ready(function() {
         $('#penjualan').DataTable({
@@ -146,18 +147,17 @@
     });
 
     function tambahPenjualan() {
-        var formData = new FormData(document.getElementById("formVendor"));
+        var formData = new FormData(document.getElementById("formPenjualan"));
+        formData.append('terjual', terjual);
 
         axios({
             method: 'post',
             url: '/penjualan',
             data: formData
         }).then(function(response) {
-            if (response.data.status == 200)
-                window.location.href = '/penjualan';
-            else
-                alert('Gagal - Ada kode yang sama')
+            window.location.href = '/penjualan';
         }).catch(function(error) {
+            console.log(error);
             alert('gagal');
         })
     }

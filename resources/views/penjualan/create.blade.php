@@ -6,12 +6,12 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form name="formBarang" id="formBarang">
+                <form name="formPenjualan" id="formPenjualan">
                     @csrf
                     <div class="mb-3 row">
                         <label class="col-sm-2 col-form-label">Tanggal</label>
                         <div class="col-sm-10">
-                            <input type="date" id="total" name="tanggal" class="form-control" required>
+                            <input type="date" id="tanggal" name="tanggal" class="form-control" required>
                         </div>
                     </div>
                     <div class="mb-3 row">
@@ -56,7 +56,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="tambahBarang()">Tambah</button>
+                <button type="button" class="btn btn-primary" onclick="tambahPenjualan()">Tambah</button>
             </div>
         </div>
     </div>

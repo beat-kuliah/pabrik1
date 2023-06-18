@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Barang;
 use App\Models\Penjualan;
 use Illuminate\Http\Request;
 
@@ -21,13 +22,18 @@ class PenjualanController extends Controller
 
     public function store(Request $request)
     {
-        $barang = new Penjualan();
-        $barang->barang_id;
-        $barang->terjual;
-        $barang->tanggal;
+        $penjualan = new Penjualan();
+        $penjualan->barang_id = $request->barang;
+        $penjualan->terjual = $request->terjual;
+        $penjualan->tanggal = $request->tanggal;
+        $penjualan->save();
+
+        $barang = Barang::find($request->barang);
+        $stok = $barang->stok_akhir - $request->terjual;
+        $barang->stok_akhir = $stok;
         $barang->save();
 
-        return 0;
+        return 200;
     }
 
     public function datatables(Request $request)
@@ -54,13 +60,13 @@ class PenjualanController extends Controller
             ->where('barang.nama', 'like', '%' . $searchValue . '%')
             ->orWhere('barang.kode', 'like', '%' . $searchValue . '%')
             ->select('penjualan.*')
-            ->join('barang', 'penjualan.barang_id', '=', 'barang.id')
+            ->join('barang', 'barang.id', '=', 'penjualan.barang_id')
             ->skip($start)
             ->take($rowperpage)
             ->get();
         $totalRecordswithFilter = count($records);
 
-        // dd(json_encode($records));
+        // return $records;
         $data_arr = array();
 
         foreach ($records as $record) {

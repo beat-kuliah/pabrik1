@@ -20,6 +20,6 @@ class Penjualan extends Model
 
     public function getBarangAttribute()
     {
-        return Barang::find($this->id);
+        return Barang::find($this->barang_id);
     }
 }
