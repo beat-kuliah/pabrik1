@@ -100,7 +100,13 @@
                 target: [7],
                 className: "text-center",
                 render: function(data, type, row) {
-                    return '<button type="button" onclick="editVendor(' + data + ')" class="btn btn-warning">Edit</button><span>   </span><button type="button" onclick="deleteVendor(' + data + ')" class="btn btn-danger">Delete</button>';
+                    var result = '<button type="button" onclick="generatePDF(' + data + ')" class="btn btn-success">PDF</button>';
+                    result += '<span>   </span>';
+                    result += '<button type="button" onclick="editVendor(' + data + ')" class="btn btn-warning">Edit</button>';
+                    result += '<span>   </span>';
+                    result += '<button type="button" onclick="deleteVendor(' + data + ')" class="btn btn-danger">Delete</button>';
+
+                    return result;
                 }
             }]
         });
@@ -160,6 +166,13 @@
             console.log(error);
             alert('gagal');
         })
+    }
+
+    function generatePDF(val) {
+        window.open(
+            '/generate-pdf/' + val,
+            '_blank'
+        )
     }
 
     function editVendor(val) {

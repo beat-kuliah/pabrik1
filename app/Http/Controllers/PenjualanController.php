@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Barang;
 use App\Models\Penjualan;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PenjualanController extends Controller
 {
@@ -34,6 +35,27 @@ class PenjualanController extends Controller
         $barang->save();
 
         return 200;
+    }
+
+    public function generatePDF($id)
+    {
+        $penjualan = Penjualan::find($id);
+        $total = $penjualan->terjual * $penjualan->barang->harga;
+        $data = [
+            'status' => 200,
+            'kode' => $penjualan->barang->kode,
+            'nama' => $penjualan->barang->nama,
+            'harga' => $this->fixPrice($penjualan->barang->harga),
+            'terjual' => $penjualan->terjual,
+            'total' => $this->fixPrice($total),
+        ];
+
+        $pdf = Pdf::loadView('pdf.penjualan', $data);
+        $pdf->set_paper('letter', 'landscape');
+        $pdf->set_base_path(__DIR__);
+        $pdf->render();
+        return $pdf->stream('invoice.pdf');
+        // return view('pdf.penjualan', $data);
     }
 
     public function datatables(Request $request)
