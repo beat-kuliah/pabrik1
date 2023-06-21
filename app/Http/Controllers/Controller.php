@@ -19,11 +19,12 @@ class Controller extends BaseController
         $result = 'Rp. ';
         $counter = 0;
         if ($remainder > 0) {
-            $result .= substr($price, $counter, $counter + $remainder) . '.';
+            $result .= substr($price, $counter, $remainder) . '.';
             $counter += $remainder;
         }
+        // $result .= substr($price, $counter, $counter + 2);
         for ($i = 1; $i <= $newRemainder; $i++) {
-            $result .= substr($price, $counter, $counter + 3);
+            $result .= substr($price, $counter, 3);
             if ($i != $newRemainder)
                 $result .= '.';
             $counter += 3;

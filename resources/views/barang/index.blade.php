@@ -72,6 +72,12 @@
                 }
             ],
             columnDefs: [{
+                target: [5],
+                className: "text-center",
+                render: function(data, type, row) {
+                    return fixPrice(data);
+                }
+            }, {
                 target: [8],
                 className: "text-center",
                 render: function(data, type, row) {
