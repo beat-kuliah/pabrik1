@@ -3,21 +3,22 @@
 @section('content')
 
 <div class="container">
-    <button style="float: right; margin-top: 50px;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createPenjualan">
-        Tambah Data
+    <button style="float: right; margin-top: 50px;" type="button" class="btn btn-primary" onclick="generatePDF()">
+        Generate PDF
     </button>
-    <h1>Penjualan</h1>
+    <h1>Report</h1>
     <br><br>
-    <table id="penjualan" class="display" style="width:100%">
+</div>
+<div class="container">
+    <table id="report" class="display" style="width:100%">
         <thead>
             <tr>
                 <th>Id</th>
                 <th>Kode</th>
                 <th>Nama</th>
                 <th>Harga</th>
-                <th>Jumlah</th>
-                <th>Total</th>
-                <th>Tanggal</th>
+                <th>Stok Awal</th>
+                <th>Stok AKhir</th>
                 <th class="text-center">Action</th>
             </tr>
         </thead>
@@ -27,9 +28,8 @@
                 <th>Kode</th>
                 <th>Nama</th>
                 <th>Harga</th>
-                <th>Jumlah</th>
-                <th>Total</th>
-                <th>Tanggal</th>
+                <th>Stok Awal</th>
+                <th>Stok AKhir</th>
                 <th class="text-center">Action</th>
             </tr>
         </tfoot>
@@ -48,11 +48,23 @@
     var terjual = 0;
     var total = 0;
 
+
     $(document).ready(function() {
-        $('#penjualan').DataTable({
+        axios.get('/barang/all')
+            .then(function(response) {
+                response.data.forEach(element => {
+                    var gudang = document.getElementById("selectBarang");
+                    var option = document.createElement("option");
+                    option.value = element.id;
+                    option.text = element.nama;
+                    gudang.add(option);
+                });
+            })
+
+        $('#report').DataTable({
             processing: true,
             serverSide: true,
-            ajax: '/penjualan/datatables',
+            ajax: '/report/datatables',
             columns: [{
                     data: 'id'
                 },
@@ -66,13 +78,10 @@
                     data: 'harga'
                 },
                 {
-                    data: 'jumlah'
+                    data: 'stok_awal'
                 },
                 {
-                    data: 'total'
-                },
-                {
-                    data: 'tanggal'
+                    data: 'stok_akhir'
                 },
                 {
                     data: 'action'
@@ -85,19 +94,7 @@
                     return fixPrice(data);
                 }
             }, {
-                target: [5],
-                className: "text-center",
-                render: function(data, type, row) {
-                    return fixPrice(data);
-                }
-            }, {
                 target: [6],
-                className: "text-center",
-                render: function(data, type, row) {
-                    return fixDateOnly(data);
-                }
-            }, {
-                target: [7],
                 className: "text-center",
                 render: function(data, type, row) {
                     var result = '<button type="button" onclick="generatePDF(' + data + ')" class="btn btn-success">PDF</button>';
@@ -110,17 +107,6 @@
                 }
             }]
         });
-
-        axios.get('/barang/all')
-            .then(function(response) {
-                response.data.forEach(element => {
-                    var gudang = document.getElementById("selectBarang");
-                    var option = document.createElement("option");
-                    option.value = element.id;
-                    option.text = element.nama;
-                    gudang.add(option);
-                });
-            })
 
     });
 
@@ -152,25 +138,9 @@
             });
     });
 
-    function tambahPenjualan() {
-        var formData = new FormData(document.getElementById("formPenjualan"));
-        formData.append('terjual', terjual);
-
-        axios({
-            method: 'post',
-            url: '/penjualan',
-            data: formData
-        }).then(function(response) {
-            window.location.href = '/penjualan';
-        }).catch(function(error) {
-            console.log(error);
-            alert('gagal');
-        })
-    }
-
     function generatePDF(val) {
         window.open(
-            '/penjualan/generate-pdf/' + val,
+            '/report/generate-pdf',
             '_blank'
         )
     }

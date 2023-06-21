@@ -60,6 +60,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/penjualan">Penjualan</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/report">Report</a>
+                        </li>
                     </ul>
                     @endguest
                     <!-- Right Side Of Navbar -->

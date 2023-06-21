@@ -4,6 +4,7 @@ use App\Http\Controllers\BarangController;
 use App\Http\Controllers\GudangController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PenjualanController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VendorController;
 use Illuminate\Support\Facades\Auth;
@@ -54,7 +55,7 @@ Route::controller(PenjualanController::class)->middleware('auth', 'role:ADMIN')-
     Route::get('/penjualan', 'index')->name('penjualan');
     Route::post('/penjualan', 'store');
     Route::get('/penjualan/datatables', 'datatables');
-    Route::get('/generate-pdf/{id}', 'generatePDF');
+    Route::get('/penjualan/generate-pdf/{id}', 'generatePDF');
 });
 
 Route::controller(BarangController::class)->middleware('auth', 'role:ADMIN')->group(function () {
@@ -64,4 +65,10 @@ Route::controller(BarangController::class)->middleware('auth', 'role:ADMIN')->gr
     Route::post('/barang/update-stok/{id}', 'updateStok');
     Route::get('/barang/find/{id}', 'findOne');
     Route::get('/barang/all', 'getAll');
+});
+
+Route::controller(ReportController::class)->middleware('auth', 'role:ADMIN')->group(function () {
+    Route::get('/report', 'index');
+    Route::get('/report/datatables', 'datatables');
+    Route::get('/report/generate-pdf', 'generatePDF');
 });

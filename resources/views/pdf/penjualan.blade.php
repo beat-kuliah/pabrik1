@@ -58,7 +58,7 @@
     <hr>
     <table>
         <tr class="total">
-            <td></td>
+            <td>{{ $tanggal }}</td>
             <td></td>
             <td></td>
             <td></td>

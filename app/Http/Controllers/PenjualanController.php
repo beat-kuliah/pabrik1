@@ -47,6 +47,7 @@ class PenjualanController extends Controller
             'nama' => $penjualan->barang->nama,
             'harga' => $this->fixPrice($penjualan->barang->harga),
             'terjual' => $penjualan->terjual,
+            'tanggal' => $this->fixDateOnly($penjualan->tanggal),
             'total' => $this->fixPrice($total),
         ];
 

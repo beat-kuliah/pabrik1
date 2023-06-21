@@ -31,4 +31,28 @@ class Controller extends BaseController
 
         return $result;
     }
+
+    public function fixDateOnly($val)
+    {
+        $day = date("d", strtotime($val));
+        $month = date("m", strtotime($val));
+        $year = date("Y", strtotime($val));
+        $bulan = [
+            '01' => "Januari",
+            '02' => "Februari",
+            '03' => "Maret",
+            '04' => "April",
+            '05' => "Mei",
+            '06' => "Juni",
+            '07' => "Juli",
+            '08' => "Agustus",
+            '09' => "September",
+            '10' => "Oktober",
+            '11' => "November",
+            '12' => "Desember"
+        ];
+        $result = $day . ' ' . $bulan[$month] . ' ' . $year;
+
+        return $result;
+    }
 }
