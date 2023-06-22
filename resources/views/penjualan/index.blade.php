@@ -37,6 +37,7 @@
 </div>
 
 @include('penjualan.create')
+@include('penjualan.edit')
 
 @endsection
 
@@ -47,6 +48,12 @@
     var stok_max = 0;
     var terjual = 0;
     var total = 0;
+    var editId;
+    var editBarangId;
+    var editHarga = 0;
+    var editStok_max = 0;
+    var editTerjual = 0;
+    var editTotal = 0;
 
     $(document).ready(function() {
         $('#penjualan').DataTable({
@@ -102,9 +109,9 @@
                 render: function(data, type, row) {
                     var result = '<button type="button" onclick="generatePDF(' + data + ')" class="btn btn-success">PDF</button>';
                     result += '<span>   </span>';
-                    result += '<button type="button" onclick="editVendor(' + data + ')" class="btn btn-warning">Edit</button>';
+                    result += '<button type="button" data-bs-toggle="modal" data-bs-target="#editPenjualan" onclick="editPenjualan(' + data + ')" class="btn btn-warning">Edit</button>';
                     result += '<span>   </span>';
-                    result += '<button type="button" onclick="deleteVendor(' + data + ')" class="btn btn-danger">Delete</button>';
+                    result += '<button type="button" onclick="deletePenjualan(' + data + ')" class="btn btn-danger">Delete</button>';
 
                     return result;
                 }
@@ -115,6 +122,17 @@
             .then(function(response) {
                 response.data.forEach(element => {
                     var gudang = document.getElementById("selectBarang");
+                    var option = document.createElement("option");
+                    option.value = element.id;
+                    option.text = element.nama;
+                    gudang.add(option);
+                });
+            })
+
+        axios.get('/barang/all')
+            .then(function(response) {
+                response.data.forEach(element => {
+                    var gudang = document.getElementById("selectEditBarang");
                     var option = document.createElement("option");
                     option.value = element.id;
                     option.text = element.nama;
@@ -152,6 +170,34 @@
             });
     });
 
+    $('#selectEditBarang').change(function() {
+        var data = parseInt($(this).val());
+        axios.get('/barang/find/' + data)
+            .then(function(response) {
+                document.getElementById("editNama").value = response.data.nama;
+                document.getElementById("editHarga").value = fixPrice(response.data.harga);
+                if (parseInt(data) == editBarangId) {
+                    editStok_max = response.data.stok_akhir + editTerjual;
+                } else {
+                    editStok_max = response.data.stok_akhir;
+                }
+                document.getElementById("editStok").value = editStok_max;
+                editHarga = response.data.harga;
+                if (editTerjual >= editStok_max)
+                    document.getElementById("editTerjual").value = editStok_max;
+                var editTotal = $('#editTerjual').val() * editHarga;
+                document.getElementById("editTotal").value = fixPrice(editTotal);
+            });
+    });
+
+    $('#editTerjual').keyup(function(event) {
+        editTerjual = $('#editTerjual').val();
+        if (editTerjual >= editStok_max)
+            document.getElementById("editTerjual").value = editStok_max;
+        var editTotal = $('#editTerjual').val() * editHarga;
+        document.getElementById("editTotal").value = fixPrice(editTotal);
+    });
+
     function tambahPenjualan() {
         var formData = new FormData(document.getElementById("formPenjualan"));
         formData.append('terjual', terjual);
@@ -175,12 +221,61 @@
         )
     }
 
-    function editVendor(val) {
-        alert('Coming Soon');
+    function editPenjualan(val) {
+        editId = val;
+        axios.get('/penjualan/show/' + val)
+            .then(function(response) {
+                editBarangId = response.data.barang_id;
+                console.log(response.data);
+                document.getElementById('editTanggal').value = response.data.tanggal;
+                document.getElementById('editTerjual').value = response.data.terjual;
+                document.getElementById('editTotal').value = fixPrice(response.data.terjual * response.data.barang.harga);
+                $('#selectEditBarang').val(response.data.barang_id);
+                document.getElementById("editNama").value = response.data.barang.nama;
+                document.getElementById("editHarga").value = fixPrice(response.data.barang.harga);
+                document.getElementById("editStok").value = response.data.barang.stok_akhir + response.data.terjual;
+                editTerjual = response.data.terjual;
+                editHarga = response.data.barang.harga;
+                editStok_max = response.data.barang.stok_akhir + response.data.terjual;
+            })
+            .catch(function(error) {
+                console.log(error);
+                alert('Gagal');
+            })
     }
 
-    function deleteVendor(val) {
-        alert('Coming Soon');
+    function updatePenjualan() {
+        var formData = new FormData(document.getElementById('formEditPenjualan'));
+        axios({
+            url: '/penjualan/update/' + editId,
+            method: 'post',
+            data: formData,
+        }).then(function(response) {
+            if (response.data == 200) {
+                alert('Success');
+                window.location.href = '/penjualan';
+            } else
+                alert('Ada kode yang sama')
+        }).catch(function(error) {
+            alert('Gagal');
+        })
+    }
+
+    function deletePenjualan(val) {
+        if (confirm("Menghapus Data Vendor akan menghapus Data Barang beserta Penjualannya juga, Anda yakin?") == true) {
+            penjualanDeleted(val);
+        }
+    }
+
+    function penjualanDeleted(val) {
+        axios.get('/penjualan/destroy/' + val)
+            .then(function(response) {
+                alert('Success');
+                window.location.href = '/penjualan';
+            })
+            .catch(function(error) {
+                alert('Gagal');
+            })
     }
 </script>
 

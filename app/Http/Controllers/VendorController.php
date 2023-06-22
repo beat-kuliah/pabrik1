@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Barang;
+use App\Models\Penjualan;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
 
@@ -41,16 +43,31 @@ class VendorController extends Controller
         return $result;
     }
 
-    public function destroy($id)
+    public function show($id)
     {
         $vendor = Vendor::find($id);
-        $vendor->delete();
 
-        $result = [
+        $data = [
             'status' => 200,
+            'vendor' => $vendor
         ];
 
-        return $result;
+        return $data;
+    }
+
+    public function update($id, Request $request)
+    {
+        $check = Vendor::where('kode', '=', $request->kode_barang)->first();
+        $vendor = Vendor::find($id);
+
+        if ($check != null && $vendor->kode != $check->kode)
+            return 500;
+
+        $vendor->kode = $request->kode_barang;
+        $vendor->nama = $request->nama;
+        $vendor->save();
+
+        return 200;
     }
 
     public function datatables(Request $request)
@@ -117,5 +134,16 @@ class VendorController extends Controller
         $vendor = Vendor::all();
 
         return $vendor;
+    }
+
+    public function destroy($id)
+    {
+        $vendor = Vendor::find($id);
+        $barang = Barang::where('vendor_id', '=', $id)->get();
+        foreach ($barang as $b) {
+            $penjualan = Penjualan::where('barang_id', '=', $b->id)->delete();
+        }
+        $barang = Barang::where('vendor_id', '=', $id)->delete();
+        $vendor->delete();
     }
 }

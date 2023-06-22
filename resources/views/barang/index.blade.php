@@ -29,6 +29,7 @@
 </div>
 
 @include('barang.create')
+@include('barang.edit')
 @include('barang.update_stok')
 
 @endsection
@@ -37,7 +38,7 @@
 
 <script>
     var updateStokId;
-
+    var id;
     $(document).ready(function() {
         $('#barang').DataTable({
             processing: true,
@@ -81,7 +82,7 @@
                 target: [8],
                 className: "text-center",
                 render: function(data, type, row) {
-                    var act = '<button type="button" onclick="editBarang(' + data + ')" class="btn btn-warning">Edit</button>';
+                    var act = '<button type="button" data-bs-toggle="modal" data-bs-target="#editBarang" onclick="editBarang(' + data + ')" class="btn btn-warning">Edit</button>';
                     act += '<span>   </span>';
                     act += '<button type="button" onclick="formUpdateStok(' + data + ')" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#updateStok">Stok</button>';
                     act += '<span>   </span>';
@@ -96,10 +97,12 @@
             .then(function(response) {
                 response.data.forEach(element => {
                     var gudang = document.getElementById("selectGudang");
+                    var editGudang = document.getElementById("selectEditGudang");
                     var option = document.createElement("option");
                     option.value = element.id;
                     option.text = element.nama;
                     gudang.add(option);
+                    editGudang.add(option);
                 });
 
             })
@@ -107,11 +110,13 @@
         axios.get('/vendor/all')
             .then(function(response) {
                 response.data.forEach(element => {
-                    var gudang = document.getElementById("selectVendor");
+                    var vendor = document.getElementById("selectVendor");
+                    var editVendor = document.getElementById("selectEditVendor");
                     var option = document.createElement("option");
                     option.value = element.id;
                     option.text = element.nama;
-                    gudang.add(option);
+                    vendor.add(option);
+                    editVendor.add(option);
                 });
 
             })
@@ -161,12 +166,56 @@
         })
     }
 
-    function editVendor(val) {
-        alert('Coming Soon');
+    function editBarang(val) {
+        id = val;
+        axios.get('/barang/find/' + id)
+            .then(function(response) {
+                console.log(response.data);
+                document.getElementById('kode_barang').value = response.data.kode;
+                document.getElementById('nama').value = response.data.nama;
+                document.getElementById('harga').value = response.data.harga;
+                $('#selectEditGudang').val(response.data.gudang_id);
+                $('#selectEditVendor').val(response.data.vendor_id);
+            })
+            .catch(function(error) {
+                console.log(error);
+                alert('Gagal');
+            })
     }
 
-    function deleteGudang(val) {
-        alert('Coming Soon');
+    function updateBarang() {
+        var formData = new FormData(document.getElementById('formEditBarang'));
+        axios({
+            url: '/barang/update/' + id,
+            method: 'post',
+            data: formData
+        }).then(function(response) {
+            if (response.data == 200) {
+                alert('Success');
+                window.location.href = '/barang';
+            } else
+                alert('Ada kode yang sama')
+        }).catch(function(error) {
+            alert('Gagal');
+        })
+    }
+
+    function barangDeleted(val) {
+        axios.get('/barang/destroy/' + val)
+            .then(function(response) {
+                alert('Success');
+                window.location.href = '/barang';
+            })
+            .catch(function(error) {
+                console.log(error);
+                alert('Gagal');
+            })
+    }
+
+    function deleteBarang(val) {
+        if (confirm("Menghapus Data Barang akan menghapus Data Penjualannya juga, Anda yakin?") == true) {
+            barangDeleted(val);
+        }
     }
 </script>
 

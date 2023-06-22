@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
@@ -29,7 +31,14 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $check = User::where('username', '=', $request->username)->get();
+        if (count($check) != 0)
+            return 500;
+
+        $user = new User();
+        $user->username = $request->username;
+        $user->password = Hash::make($request->password);
+        $user->save();
     }
 
     /**
@@ -37,7 +46,8 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $user = User::find($id);
+        return $user;
     }
 
     /**
@@ -144,6 +154,27 @@ class UserController extends Controller
         );
 
         return json_encode($response);
+    }
+
+    public function update_role($id, Request $request)
+    {
+        $user = User::find($id);
+        $role = Role::findById($request->role);
+
+        $user->syncRoles();
+        $user->assignRole($role->name);
+
+        return 200;
+    }
+
+    public function update_password(Request $request)
+    {
+        $user = User::find(Auth::user()->id);
+
+        $user->password = Hash::make($request->editPassword);
+        $user->save();
+
+        return 200;
     }
 
     public function role()

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Barang;
 use App\Models\Gudang;
+use App\Models\Penjualan;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
 
@@ -48,6 +49,24 @@ class BarangController extends Controller
         ];
 
         return $data;
+    }
+
+    public function update($id, Request $request)
+    {
+        $check = Barang::where('kode', '=', $request->kode_barang)->first();
+        $barang = Barang::find($id);
+
+        if ($check != null && $barang->kode != $check->kode)
+            return 500;
+
+        $barang->kode = $request->kode_barang;
+        $barang->nama = $request->nama;
+        $barang->harga = $request->harga;
+        $barang->gudang_id = $request->vendor;
+        $barang->vendor_id = $request->gudang;
+        $barang->save();
+
+        return 200;
     }
 
     public function updateStok($id, Request $request)
@@ -142,5 +161,14 @@ class BarangController extends Controller
         );
 
         return json_encode($response);
+    }
+
+    public function destroy($id)
+    {
+        $barang = Barang::find($id);
+        $penjualan = Penjualan::where('barang_id', '=', $id)->delete();
+        $barang->delete();
+
+        return 200;
     }
 }

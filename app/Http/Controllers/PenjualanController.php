@@ -37,6 +37,50 @@ class PenjualanController extends Controller
         return 200;
     }
 
+    public function show($id)
+    {
+        $penjualan = Penjualan::find($id);
+
+        return $penjualan;
+    }
+
+    public function update($id, Request $request)
+    {
+        $penjualan = Penjualan::find($id);
+        $barang = Barang::find($penjualan->barang_id);
+
+        if ($penjualan->barang_id == $request->barang) {
+            if ($penjualan->terjual != $request->terjual) {
+                if ($penjualan->terjual > $request->terjual) {
+                    $diff = $penjualan->terjual - $request->terjual;
+                    $newStok = $barang->stok_akhir + $diff;
+                    $barang->stok_akhir = $newStok;
+                    if ($newStok > $barang->stok_awal)
+                        $barang->stok_awal = $newStok;
+                } else {
+                    $diff = $request->terjual - $penjualan->terjual;
+                    $barang->stok_akhir = $barang->stok_akhir - $diff;
+                }
+            }
+        } else {
+            $newStok = $barang->stok_akhir + $penjualan->terjual;
+            $barang->stok_akhir = $newStok;
+            if ($newStok > $barang->stok_awal)
+                $barang->stok_awal = $newStok;
+            $penjualan->barang_id = $request->barang;
+            $newBarang = Barang::find($request->barang);
+            $newBarang->stok_akhir = $newBarang->stok_akhir - $request->terjual;
+            $newBarang->save();
+        }
+        $penjualan->terjual = $request->terjual;
+        $penjualan->tanggal = $request->tanggal;
+
+        $barang->save();
+        $penjualan->save();
+
+        return 200;
+    }
+
     public function generatePDF($id)
     {
         $penjualan = Penjualan::find($id);
@@ -56,7 +100,23 @@ class PenjualanController extends Controller
         $pdf->set_base_path(__DIR__);
         $pdf->render();
         return $pdf->stream('invoice.pdf');
-        // return view('pdf.penjualan', $data);
+    }
+
+    public function destroy($id)
+    {
+        $penjualan = Penjualan::find($id);
+        $barang = Barang::find($penjualan->barang_id);
+
+        $newStok = $barang->stok_akhir + $penjualan->terjual;
+
+        $barang->stok_akhir = $newStok;
+        if ($newStok > $barang->stok_awal)
+            $barang->stok_awal = $newStok;
+
+        $barang->save();
+        $penjualan->delete();
+
+        return 200;
     }
 
     public function datatables(Request $request)

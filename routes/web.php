@@ -31,7 +31,10 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 Route::controller(UserController::class)->middleware('auth', 'role:ADMIN')->group(function () {
     Route::get('/user', 'index')->name('user');
-    Route::get('/user/{id}/update', 'edit');
+    Route::post('/user', 'store');
+    Route::get('/user/show/{id}', 'show');
+    Route::post('/user/update-role/{id}', 'update_role');
+    Route::post('/user/update-password', 'update_password');
     Route::delete('/user/{id}', 'destroy');
     Route::get('/user/datatables', 'datatables');
     Route::get('/role', 'role');
@@ -40,31 +43,42 @@ Route::controller(UserController::class)->middleware('auth', 'role:ADMIN')->grou
 Route::controller(GudangController::class)->middleware('auth', 'role:ADMIN')->group(function () {
     Route::get('/gudang', 'index')->name('gudang');
     Route::post('/gudang', 'store');
+    Route::get('/gudang/show/{id}', 'show');
+    Route::get('/gudang/destroy/{id}', 'destroy');
+    Route::post('/gudang/update/{id}', 'update');
     Route::get('/gudang/datatables', 'datatables');
     Route::get('/gudang/all', 'getAll');
 });
 
 Route::controller(VendorController::class)->middleware('auth', 'role:ADMIN')->group(function () {
     Route::get('/vendor', 'index')->name('vendor');
-    Route::post('/vendor', 'store');
+    Route::get('/vendor/show/{id}', 'show');
     Route::get('/vendor/datatables', 'datatables');
     Route::get('/vendor/all', 'getAll');
+    Route::get('/vendor/destroy/{id}', 'destroy');
+    Route::post('/vendor', 'store');
+    Route::post('/vendor/update/{id}', 'update');
 });
 
 Route::controller(PenjualanController::class)->middleware('auth', 'role:ADMIN')->group(function () {
     Route::get('/penjualan', 'index')->name('penjualan');
     Route::post('/penjualan', 'store');
+    Route::post('/penjualan/update/{id}', 'update');
+    Route::get('/penjualan/destroy/{id}', 'destroy');
+    Route::get('/penjualan/show/{id}', 'show');
     Route::get('/penjualan/datatables', 'datatables');
     Route::get('/penjualan/generate-pdf/{id}', 'generatePDF');
 });
 
 Route::controller(BarangController::class)->middleware('auth', 'role:ADMIN')->group(function () {
     Route::get('/barang', 'index')->name('barang');
-    Route::post('/barang', 'store');
-    Route::get('/barang/datatables', 'datatables');
-    Route::post('/barang/update-stok/{id}', 'updateStok');
     Route::get('/barang/find/{id}', 'findOne');
     Route::get('/barang/all', 'getAll');
+    Route::get('/barang/datatables', 'datatables');
+    Route::get('/barang/destroy/{id}', 'destroy');
+    Route::post('/barang/update-stok/{id}', 'updateStok');
+    Route::post('/barang', 'store');
+    Route::post('/barang/update/{id}', 'update');
 });
 
 Route::controller(ReportController::class)->middleware('auth', 'role:ADMIN')->group(function () {

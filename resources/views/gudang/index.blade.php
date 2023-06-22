@@ -35,12 +35,15 @@
 </div>
 
 @include('gudang.create')
+@include('gudang.edit')
 
 @endsection
 
 @section('script')
 
 <script>
+    var id = 0;
+
     $(document).ready(function() {
         $('#gudang').DataTable({
             processing: true,
@@ -69,7 +72,7 @@
                     target: [5],
                     className: "text-center",
                     render: function(data, type, row) {
-                        return '<button type="button" onclick="editVendor(' + data + ')" class="btn btn-warning">Edit</button><span>   </span><button type="button" onclick="deleteVendor(' + data + ')" class="btn btn-danger">Delete</button>';
+                        return '<button type="button" data-bs-toggle="modal" data-bs-target="#editGudang" onclick="editGudang(' + data + ')" class="btn btn-warning">Edit</button><span>   </span><button type="button" onclick="deleteGudang(' + data + ')" class="btn btn-danger">Delete</button>';
                     }
                 },
                 {
@@ -106,12 +109,52 @@
         })
     }
 
-    function editVendor(val) {
-        alert('Coming Soon');
+    function editGudang(val) {
+        id = val;
+        axios.get('/gudang/show/' + val)
+            .then(function(response) {
+                document.getElementById('kode_barang').value = response.data.gudang.kode;
+                document.getElementById('nama').value = response.data.gudang.nama;
+            })
+            .catch(function(error) {
+                console.log(error);
+            })
+    }
+
+    function updateGudang() {
+        var formData = new FormData(document.getElementById('formEditGudang'));
+        axios({
+            url: '/gudang/update/' + id,
+            method: 'post',
+            data: formData,
+        }).then(function(response) {
+            if (response.data == 200) {
+                alert('Success');
+                window.location.href = '/gudang';
+            } else {
+                alert('Ada Kode yang sama');
+            }
+        }).catch(function(error) {
+            alert('gagal');
+        })
+    }
+
+    function gudangDeleted(val) {
+        axios.get('/gudang/destroy/' + val)
+            .then(function(response) {
+                alert('Success');
+                window.location.href = '/barang';
+            })
+            .catch(function(error) {
+                console.log(error);
+                alert('Gagal');
+            })
     }
 
     function deleteGudang(val) {
-        alert('Coming Soon');
+        if (confirm("Menghapus Data Gudang akan menghapus Data Barang beserta Penjualannya juga, Anda yakin?") == true) {
+            gudangDeleted(val);
+        }
     }
 </script>
 

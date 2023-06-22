@@ -87,6 +87,8 @@
                             </a>
 
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+
+                                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#updatePassword">Edit Password</a>
                                 <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
                                     {{ __('Logout') }}
@@ -107,7 +109,24 @@
             @yield('content')
         </main>
     </div>
+
+    @include('user.edit')
 </body>
 @yield('script')
+<script>
+    function updatePassword() {
+        var formData = new FormData(document.getElementById('formPassword'));
+        axios({
+            url: '/user/update-password',
+            method: 'post',
+            data: formData
+        }).then(function(response) {
+            alert('Success');
+            window.location.href = '/home';
+        }).catch(function(error) {
+            alert('Gagal');
+        })
+    }
+</script>
 
 </html>

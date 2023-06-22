@@ -40,4 +40,12 @@ class User extends Authenticatable
     protected $casts = [
         'password' => 'hashed',
     ];
+
+
+    protected $appends = ['role'];
+
+    public function getRoleAttribute()
+    {
+        return $this->getRoleNames();
+    }
 }

@@ -3,7 +3,11 @@
 @section('content')
 
 <div class="container">
+    <button style="float: right; margin-top: 50px;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUser">
+        Tambah Data
+    </button>
     <h1>User</h1>
+    <br><br>
     <div class="table-responsive">
         <table id="user" class="display" style="width:100%">
             <thead>
@@ -30,11 +34,17 @@
     </div>
 </div>
 
+@include('user.create')
+@include('user.edit')
+@include('user.role')
+
 @endsection
 
 @section('script')
 
 <script>
+    var editId;
+
     $(document).ready(function() {
         $('#user').DataTable({
             processing: true,
@@ -63,7 +73,7 @@
                     target: [5],
                     className: "text-center",
                     render: function(data, type, row) {
-                        return '<button type="button" onclick="editUser(' + data + ')" class="btn btn-warning">Edit</button><span>   </span><button type="button" onclick="deleteUser(' + data + ')" class="btn btn-danger">Delete</button>';
+                        return '<button type="button" data-bs-toggle="modal" data-bs-target="#updateRole" onclick="updateRole(' + data + ')" class="btn btn-warning">role</button><span>   </span><button type="button" onclick="deleteUser(' + data + ')" class="btn btn-danger">Delete</button>';
                     }
                 },
                 {
@@ -117,19 +127,70 @@
                     });
             },
         });
+
+        axios.get('/role')
+            .then(function(response) {
+                response.data.forEach(element => {
+                    var role = document.getElementById("selectRole");
+                    var option = document.createElement("option");
+                    option.value = element.id;
+                    option.text = element.name;
+                    role.add(option);
+                });
+            })
     });
 
-    function editUser(val) {
-        axios.get('/user/' + val + '/update')
-            .then(function(response) {
+    function tambahUser() {
+        var formData = new FormData(document.getElementById('formUser'));
+        axios({
+            url: '/user',
+            method: 'post',
+            data: formData
+        }).then(function(response) {
+            if (response.data = 200) {
+                alert('Success');
                 window.location.href = '/user';
+            } else
+                alert('Ada Username yang sama');
+        }).catch(function(error) {
+            console.log(error);
+            alert('Gagal');
+        })
+    }
+
+    function updateRole(val) {
+        editId = val;
+        axios.get('/user/show/' + val)
+            .then(function(response) {
+                $('#selectRole').val(response.data.roles[0].id);
             })
             .catch(function(error) {
-                console.log(error.response);
+                console.log(error);
             })
+
+    }
+
+    function updatedRole() {
+        var formData = new FormData(document.getElementById('formUpdateRole'));
+        axios({
+            url: '/user/update-role/' + editId,
+            method: 'post',
+            data: formData
+        }).then(function(response) {
+            alert('Success');
+            window.location.href = '/user';
+        }).catch(function(error) {
+            alert('Gagal');
+        })
     }
 
     function deleteUser(val) {
+        if (confirm("Anda yakin?") == true) {
+            userDeleted(val);
+        }
+    }
+
+    function userDeleted(val) {
         axios.delete('/user/' + val)
             .then(function(response) {
                 window.location.href = '/user';

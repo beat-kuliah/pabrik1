@@ -35,12 +35,15 @@
 </div>
 
 @include('vendor.create')
+@include('vendor.edit')
 
 @endsection
 
 @section('script')
 
 <script>
+    var id = 0;
+
     $(document).ready(function() {
         $('#vendor').DataTable({
             processing: true,
@@ -69,7 +72,7 @@
                     target: [5],
                     className: "text-center",
                     render: function(data, type, row) {
-                        return '<button type="button" onclick="editVendor(' + data + ')" class="btn btn-warning">Edit</button><span>   </span><button type="button" onclick="deleteVendor(' + data + ')" class="btn btn-danger">Delete</button>';
+                        return '<button type="button" data-bs-toggle="modal" data-bs-target="#editVendor" onclick="editVendor(' + data + ')" class="btn btn-warning">Edit</button><span>   </span><button type="button" onclick="deleteVendor(' + data + ')" class="btn btn-danger">Delete</button>';
                     }
                 },
                 {
@@ -109,11 +112,51 @@
     }
 
     function editVendor(val) {
-        alert('Coming Soon');
+        id = val;
+        axios.get('/vendor/show/' + val)
+            .then(function(response) {
+                document.getElementById('kode_barang').value = response.data.vendor.kode;
+                document.getElementById('nama').value = response.data.vendor.nama;
+            })
+            .catch(function(error) {
+                console.log(error);
+            })
+    }
+
+    function updateVendor() {
+        var formData = new FormData(document.getElementById('formEditVendor'));
+        axios({
+            url: '/vendor/update/' + id,
+            method: 'post',
+            data: formData
+        }).then(function(response) {
+            if (response.data == 200) {
+                alert('Success');
+                window.location.href = '/vendor';
+            } else {
+                alert('Ada Kode yang sama');
+            }
+        }).catch(function(error) {
+            alert('gagal');
+        })
+    }
+
+    function vendorDeleted(val) {
+        axios.get('/vendor/destroy/' + val)
+            .then(function(response) {
+                alert('Success');
+                window.location.href = '/barang';
+            })
+            .catch(function(error) {
+                console.log(error);
+                alert('Gagal');
+            })
     }
 
     function deleteVendor(val) {
-        alert('Coming Soon');
+        if (confirm("Menghapus Data Vendor akan menghapus Data Barang beserta Penjualannya juga, Anda yakin?") == true) {
+            vendorDeleted(val);
+        }
     }
 </script>
 

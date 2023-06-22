@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Barang;
 use App\Models\Gudang;
+use App\Models\Penjualan;
 use Illuminate\Http\Request;
 
 class GudangController extends Controller
@@ -39,6 +41,33 @@ class GudangController extends Controller
         ];
 
         return $result;
+    }
+
+    public function show($id)
+    {
+        $gudang = Gudang::find($id);
+
+        $data = [
+            'status' => 200,
+            'gudang' => $gudang
+        ];
+
+        return $data;
+    }
+
+    public function update($id, Request $request)
+    {
+        $check = Gudang::where('kode', '=', $request->kode_barang)->first();
+        $gudang = Gudang::find($id);
+
+        if ($check != null && $gudang->kode != $check->kode)
+            return 500;
+
+        $gudang->kode = $request->kode_barang;
+        $gudang->nama = $request->nama;
+        $gudang->save();
+
+        return 200;
     }
 
     public function datatables(Request $request)
@@ -105,5 +134,16 @@ class GudangController extends Controller
         $gudang = Gudang::all();
 
         return $gudang;
+    }
+
+    public function destroy($id)
+    {
+        $gudang = Gudang::find($id);
+        $barang = Barang::where('gudang_id', '=', $id)->get();
+        foreach ($barang as $b) {
+            $penjualan = Penjualan::where('barang_id', '=', $b->id)->delete();
+        }
+        $barang = Barang::where('gudang_id', '=', $id)->delete();
+        $gudang->delete();
     }
 }
