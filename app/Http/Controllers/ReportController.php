@@ -253,7 +253,7 @@ class ReportController extends Controller
                 "tanggal" => $tanggal,
                 "kode" => $kode,
                 "nama" => $nama,
-                "harga" => $harga,
+                "harga" => $this->fixPrice($harga),
                 "qty" => $qty,
                 "total" => $this->fixPrice($total),
             );
