@@ -15,6 +15,7 @@
                     <th>Id</th>
                     <th>Kode</th>
                     <th>Nama</th>
+                    <th>Vendor</th>
                     <th>Created</th>
                     <th>Updated</th>
                     <th class="text-center">Action</th>
@@ -25,6 +26,7 @@
                     <th>Id</th>
                     <th>Kode</th>
                     <th>Nama</th>
+                    <th>Vendor</th>
                     <th>Created</th>
                     <th>Updated</th>
                     <th class="text-center">Action</th>
@@ -59,6 +61,9 @@
                     data: 'nama'
                 },
                 {
+                    data: 'vendor'
+                },
+                {
                     data: 'created_at'
                 },
                 {
@@ -69,10 +74,17 @@
                 }
             ],
             columnDefs: [{
-                    target: [5],
+                    target: [6],
                     className: "text-center",
                     render: function(data, type, row) {
                         return '<button type="button" data-bs-toggle="modal" data-bs-target="#editGudang" onclick="editGudang(' + data + ')" class="btn btn-warning">Edit</button><span>   </span><button type="button" onclick="deleteGudang(' + data + ')" class="btn btn-danger">Delete</button>';
+                    }
+                },
+                {
+                    target: [5],
+                    className: "text-center",
+                    render: function(data, type, row) {
+                        return fixDate(data);
                     }
                 },
                 {
@@ -81,28 +93,48 @@
                     render: function(data, type, row) {
                         return fixDate(data);
                     }
-                },
-                {
-                    target: [3],
-                    className: "text-center",
-                    render: function(data, type, row) {
-                        return fixDate(data);
-                    }
                 }
             ]
         });
+
+        axios.get('/vendor/all')
+            .then(function(response) {
+                response.data.forEach(element => {
+                    var option = document.createElement("option");
+                    option.value = element.id;
+                    option.text = element.nama;
+                    var vendor = document.getElementById("selectVendor");
+                    vendor.add(option);
+                });
+            }).catch(function(error) {
+                console.log(error)
+            })
+
+        axios.get('/vendor/all')
+            .then(function(response) {
+                response.data.forEach(element => {
+                    var option = document.createElement("option");
+                    option.value = element.id;
+                    option.text = element.nama;
+                    var editVendor = document.getElementById("selectEditVendor");
+                    editVendor.add(option);
+                });
+            }).catch(function(error) {
+                console.log(error)
+            })
     });
 
-    function tambahVendor() {
+    function tambahGudang() {
         var formData = new FormData(document.getElementById("formGudang"));
         axios({
             method: 'post',
             url: '/gudang',
             data: formData
         }).then(function(response) {
-            if (response.data.status == 200)
+            if (response.data.status == 200) {
+                alert('Success');
                 window.location.href = '/gudang';
-            else
+            } else
                 alert('Gagal - Ada kode yang sama')
         }).catch(function(error) {
             alert('gagal');
@@ -113,8 +145,17 @@
         id = val;
         axios.get('/gudang/show/' + val)
             .then(function(response) {
+                console.log(response);
                 document.getElementById('kode_barang').value = response.data.gudang.kode;
                 document.getElementById('nama').value = response.data.gudang.nama;
+                $('#selectEditVendor').val(response.data.vendor_id);
+                if (response.data.gudang.alamat.length != 0) {
+                    counter = 1;
+                    response.data.gudang.alamat.forEach(element => {
+                        document.getElementById('alamat' + counter).value = element.alamat;
+                        counter += 1;
+                    });
+                }
             })
             .catch(function(error) {
                 console.log(error);
@@ -135,6 +176,7 @@
                 alert('Ada Kode yang sama');
             }
         }).catch(function(error) {
+            console.log(error);
             alert('gagal');
         })
     }

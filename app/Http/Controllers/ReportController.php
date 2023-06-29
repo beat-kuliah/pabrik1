@@ -3,32 +3,64 @@
 namespace App\Http\Controllers;
 
 use App\Models\Barang;
+use App\Models\Gudang;
+use App\Models\Penjualan;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
     public function index()
     {
-        return view('report.index');
+        return view('report.stok');
     }
 
-    public function generatePDF()
+    public function stokGeneratePDF($tanggal, $gudang)
     {
-        $barang = Barang::all();
+        $records = Barang::where('gudang_id', '=', $gudang)->get();
+
+        $data_arr = array();
+        foreach ($records as $record) {
+            $terjual_akhir = DB::select('select SUM(terjual) as terjual from penjualan where barang_id = ' . $record->id . ' AND tanggal > "' . $tanggal . '"')[0]->terjual;
+            $terjual_proses = (int)DB::select('select SUM(terjual) as terjual from penjualan where barang_id = ' . $record->id . ' AND tanggal = "' . $tanggal . '" AND created_at >= "' . $record->updated_at . '"')[0]->terjual;
+            $id = $record->id;
+            $kode = $record->kode;
+            $nama = $record->nama;
+            $harga = $record->harga;
+            $stok_akhir = $record->stok_akhir + $terjual_akhir;
+            $stok_awal = $stok_akhir + $terjual_proses;
+            $penjualan = $terjual_proses;
+
+            $data_arr[] = array(
+                "id" => $id,
+                "kode" => $kode,
+                "nama" => $nama,
+                "harga" => $harga,
+                "stok_awal" => $stok_awal,
+                "penjualan" => $penjualan,
+                "stok_akhir" => $stok_akhir,
+                "action" => $id,
+            );
+        }
+
+        $gudang = Gudang::find($gudang);
 
         $data = [
-            'barang' => $barang,
+            'barang' => $data_arr,
+            'tanggal' => $this->fixDateOnly($tanggal),
+            'gudang' => $gudang,
+            'dibuat' => date("H:i:s"),
         ];
 
-        $pdf = Pdf::loadView('pdf.report', $data);
+        $pdf = Pdf::loadView('pdf.stok_report', $data);
         $pdf->set_paper('letter', 'landscape');
         $pdf->set_base_path(__DIR__);
         $pdf->render();
         return $pdf->stream('invoice.pdf');
     }
 
-    public function datatables(Request $request)
+    public function stokDatatables($tanggal, $gudang, Request $request)
     {
         $draw = (int)$request->get('draw');
         $start = (int)$request->get("start");
@@ -48,23 +80,34 @@ class ReportController extends Controller
         $totalRecords = Barang::select('count(*) as allcount')->count();
         // $searchValue = 'z';
         // Fetch records
-        $records = Barang::orderBy($columnName, $columnSortOrder)
-            ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
-            ->skip($start)
-            ->take($rowperpage)
-            ->get();
+        if ($gudang != 'null') {
+            $records = Barang::orderBy($columnName, $columnSortOrder)
+                ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
+                ->where('barang.gudang_id', '=', $gudang)
+                ->skip($start)
+                ->take($rowperpage)
+                ->get();
+        } else {
+            $records = Barang::orderBy($columnName, $columnSortOrder)
+                ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
+                ->skip($start)
+                ->take($rowperpage)
+                ->get();
+        }
         $totalRecordswithFilter = count($records);
 
         // return $penjualan;
         $data_arr = array();
-
         foreach ($records as $record) {
+            $terjual_akhir = DB::select('select SUM(terjual) as terjual from penjualan where barang_id = ' . $record->id . ' AND tanggal > "' . $tanggal . '"')[0]->terjual;
+            $terjual_proses = (int)DB::select('select SUM(terjual) as terjual from penjualan where barang_id = ' . $record->id . ' AND tanggal = "' . $tanggal . '" AND created_at >= "' . $record->updated_at . '"')[0]->terjual;
             $id = $record->id;
             $kode = $record->kode;
             $nama = $record->nama;
             $harga = $record->harga;
-            $stok_awal = $record->stok_awal;
-            $stok_akhir = $record->stok_akhir;
+            $stok_akhir = $record->stok_akhir + $terjual_akhir;
+            $stok_awal = $stok_akhir + $terjual_proses;
+            $penjualan = $terjual_proses;
 
             $data_arr[] = array(
                 "id" => $id,
@@ -72,6 +115,7 @@ class ReportController extends Controller
                 "nama" => $nama,
                 "harga" => $harga,
                 "stok_awal" => $stok_awal,
+                "penjualan" => $penjualan,
                 "stok_akhir" => $stok_akhir,
                 "action" => $id,
             );

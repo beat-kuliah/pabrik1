@@ -15,7 +15,7 @@
 
     th,
     td {
-        width: 180px;
+        width: 150px;
         text-align: center;
     }
 
@@ -39,6 +39,9 @@
     <center>
         <h1>Stock Report</h1>
     </center>
+    <h3>Gudang : {{ $gudang->nama }}</h3>
+    <h3>Tanggal : {{ $tanggal }}</h3>
+    <h3>Dibuat : {{ $dibuat }}</h3>
     <table>
         <tr>
             <th>
@@ -54,25 +57,31 @@
                 <h3>Stok Awal</h3>
             </th>
             <th>
+                <h3>Terjual</h3>
+            </th>
+            <th>
                 <h3>Stok Akhir</h3>
             </th>
         </tr>
         @foreach ($barang as $b)
         <tr>
             <td>
-                <h3>{{ $b->id }}</h3>
+                <h3>{{ $b['id'] }}</h3>
             </td>
             <td>
-                <h3>{{ $b->kode }}</h3>
+                <h3>{{ $b['kode'] }}</h3>
             </td>
             <td>
-                <h3>{{ $b->nama }}</h3>
+                <h3>{{ $b['nama'] }}</h3>
             </td>
             <td>
-                <h3>{{ $b->stok_awal }}</h3>
+                <h3>{{ $b['stok_awal'] }}</h3>
             </td>
             <td>
-                <h3>{{ $b->stok_akhir }}</h3>
+                <h3>{{ $b['penjualan'] }}</h3>
+            </td>
+            <td>
+                <h3>{{ $b['stok_akhir'] }}</h3>
             </td>
         </tr>
 

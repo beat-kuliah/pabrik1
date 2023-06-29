@@ -11,7 +11,7 @@ class Barang extends Model
 
     protected $table = 'barang';
     protected $primaryKey = 'id';
-    protected $appends = ['vendor', 'gudang'];
+    protected $appends = ['gudang'];
 
     protected $fillable = [
         'kode',
@@ -20,11 +20,6 @@ class Barang extends Model
         'stok_akhir',
         'harga',
     ];
-
-    public function getVendorAttribute()
-    {
-        return Vendor::find($this->vendor_id);
-    }
 
     public function getGudangAttribute()
     {

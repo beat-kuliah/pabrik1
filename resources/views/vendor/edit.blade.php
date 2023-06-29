@@ -20,6 +20,12 @@
                             <input type="text" name="nama" id="nama" class="form-control" required>
                         </div>
                     </div>
+                    <div class="mb-3 row">
+                        <label class="col-sm-2 col-form-label">Alamat</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="alamat" id="alamat" class="form-control" required>
+                        </div>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">

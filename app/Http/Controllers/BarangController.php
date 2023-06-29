@@ -35,7 +35,6 @@ class BarangController extends Controller
             $barang->stok_awal = $request->stok;
             $barang->stok_akhir = $request->stok;
             $barang->harga  = $request->harga;
-            $barang->vendor_id = $request->vendor;
             $barang->gudang_id = $request->gudang;
             $barang->save();
 
@@ -63,7 +62,6 @@ class BarangController extends Controller
         $barang->nama = $request->nama;
         $barang->harga = $request->harga;
         $barang->gudang_id = $request->vendor;
-        $barang->vendor_id = $request->gudang;
         $barang->save();
 
         return 200;
@@ -137,7 +135,7 @@ class BarangController extends Controller
             $stok_awal = $record->stok_awal;
             $stok_akhir = $record->stok_akhir;
             $harga = $record->harga;
-            $vendor = $record->vendor->nama;
+            $vendor = $record->gudang->vendor->nama;
             $gudang = $record->gudang->nama;
 
             $data_arr[] = array(

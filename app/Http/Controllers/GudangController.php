@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Alamat;
 use App\Models\Barang;
 use App\Models\Gudang;
 use App\Models\Penjualan;
@@ -29,18 +30,39 @@ class GudangController extends Controller
             $gudang = new Gudang();
             $gudang->kode = $request->kode_barang;
             $gudang->nama = $request->nama;
+            $gudang->vendor_id = $request->vendor;
             $gudang->save();
+
+            if ($request->alamat1 != null) {
+                $alamat = new Alamat();
+                $alamat->gudang_id = $gudang->id;
+                $alamat->alamat = $request->alamat1;
+                $alamat->save();
+            }
+            if ($request->alamat2 != null) {
+                $alamat = new Alamat();
+                $alamat->gudang_id = $gudang->id;
+                $alamat->alamat = $request->alamat2;
+                $alamat->save();
+            }
+            if ($request->alamat3 != null) {
+                $alamat = new Alamat();
+                $alamat->gudang_id = $gudang->id;
+                $alamat->alamat = $request->alamat3;
+                $alamat->save();
+            }
+
 
             $status = 200;
         } else {
             $status = 500;
         }
 
-        $result = [
-            'status' => $status,
+        $data = [
+            'status' => $status
         ];
 
-        return $result;
+        return $data;
     }
 
     public function show($id)
@@ -65,6 +87,47 @@ class GudangController extends Controller
 
         $gudang->kode = $request->kode_barang;
         $gudang->nama = $request->nama;
+        $alamats = Alamat::where('gudang_id', '=', $id)->get();
+
+        if (count($alamats) >= 1) {
+            if ($request->alamat1 != null) {
+                $alamat = Alamat::find($alamats[0]->id);
+                if ($alamat == null)
+                    $alamat = new Alamat();
+                $alamat->gudang_id = $id;
+                $alamat->alamat = $request->alamat1;
+                $alamat->save();
+            } else {
+                $alamat = Alamat::find($alamats[2]->id);
+                $alamat->delete();
+            }
+        }
+        if (count($alamats) >= 2) {
+            if ($request->alamat2 != null) {
+                $alamat = Alamat::find($alamats[1]->id);
+                if ($alamat == null)
+                    $alamat = new Alamat();
+                $alamat->gudang_id = $id;
+                $alamat->alamat = $request->alamat2;
+                $alamat->save();
+            } else {
+                $alamat = Alamat::find($alamats[2]->id);
+                $alamat->delete();
+            }
+        }
+        if (count($alamats) >= 3) {
+            if ($request->alamat3 != null) {
+                $alamat = Alamat::find($alamats[2]->id);
+                if ($alamat == null)
+                    $alamat = new Alamat();
+                $alamat->gudang_id = $id;
+                $alamat->alamat = $request->alamat3;
+                $alamat->save();
+            } else {
+                $alamat = Alamat::find($alamats[2]->id);
+                $alamat->delete();
+            }
+        }
         $gudang->save();
 
         return 200;
@@ -106,6 +169,7 @@ class GudangController extends Controller
             $id = $record->id;
             $kode = $record->kode;
             $nama = $record->nama;
+            $vendor = $record->vendor->nama;
             $created_at = $record->created_at;
             $updated_at = $record->updated_at;
 
@@ -113,6 +177,7 @@ class GudangController extends Controller
                 "id" => $id,
                 "kode" => $kode,
                 "nama" => $nama,
+                'vendor' => $vendor,
                 "created_at" => $created_at,
                 "updated_at" => $updated_at,
                 "action" => $id,

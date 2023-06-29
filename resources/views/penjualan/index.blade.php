@@ -200,7 +200,6 @@
 
     function tambahPenjualan() {
         var formData = new FormData(document.getElementById("formPenjualan"));
-        formData.append('terjual', terjual);
 
         axios({
             method: 'post',

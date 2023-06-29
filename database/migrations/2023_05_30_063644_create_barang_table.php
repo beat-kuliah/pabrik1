@@ -18,7 +18,6 @@ return new class extends Migration
             $table->integer('stok_awal');
             $table->integer('stok_akhir');
             $table->integer('harga');
-            $table->integer('vendor_id');
             $table->integer('gudang_id');
             $table->timestamps();
         });

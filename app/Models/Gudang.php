@@ -11,7 +11,7 @@ class Gudang extends Model
 
     protected $table = 'gudang';
     protected $primaryKey = 'id';
-    protected $appends = ['alamat'];
+    protected $appends = ['alamat', 'vendor'];
 
     protected $fillable = [
         'kode',
@@ -20,7 +20,11 @@ class Gudang extends Model
 
     public function getAlamatAttribute()
     {
-        return Alamat::where('gudang_id', '==', $this->id)->get();
+        return Alamat::where('gudang_id', '=', $this->id)->get();
     }
 
+    public function getVendorAttribute()
+    {
+        return Vendor::find($this->vendor_id);
+    }
 }

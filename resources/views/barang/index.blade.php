@@ -97,26 +97,22 @@
             .then(function(response) {
                 response.data.forEach(element => {
                     var gudang = document.getElementById("selectGudang");
-                    var editGudang = document.getElementById("selectEditGudang");
                     var option = document.createElement("option");
                     option.value = element.id;
                     option.text = element.nama;
                     gudang.add(option);
-                    editGudang.add(option);
                 });
 
             })
 
-        axios.get('/vendor/all')
+        axios.get('/gudang/all')
             .then(function(response) {
                 response.data.forEach(element => {
-                    var vendor = document.getElementById("selectVendor");
-                    var editVendor = document.getElementById("selectEditVendor");
+                    var editGudang = document.getElementById("selectEditGudang");
                     var option = document.createElement("option");
                     option.value = element.id;
                     option.text = element.nama;
-                    vendor.add(option);
-                    editVendor.add(option);
+                    editGudang.add(option);
                 });
 
             })
@@ -175,7 +171,6 @@
                 document.getElementById('nama').value = response.data.nama;
                 document.getElementById('harga').value = response.data.harga;
                 $('#selectEditGudang').val(response.data.gudang_id);
-                $('#selectEditVendor').val(response.data.vendor_id);
             })
             .catch(function(error) {
                 console.log(error);

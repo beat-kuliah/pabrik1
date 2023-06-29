@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->text('kode');
             $table->string('nama');
+            $table->integer('vendor_id');
             $table->timestamps();
         });
     }
