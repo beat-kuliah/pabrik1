@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="container">
-    <button style="float: right; margin-top: 50px;" type="button" class="btn btn-primary" onclick="generatePDF()">
+    <button style="float: right; margin-top: 50px;" type="button" id="generate" class="btn btn-primary disabled" onclick="generatePDF()">
         Generate PDF
     </button>
     <h1>Report Penjualan</h1>
@@ -31,24 +31,24 @@
     <table id="report" class="display" style="display:none;width:100%">
         <thead>
             <tr>
-                <th>Id</th>
+                <th>No</th>
+                <th>Tanggal</th>
                 <th>Kode</th>
                 <th>Nama</th>
                 <th>Harga</th>
-                <th>Stok Awal</th>
-                <th>Penjualan</th>
-                <th>Stok Akhir</th>
+                <th>Qty</th>
+                <th>Total</th>
             </tr>
         </thead>
         <tfoot>
             <tr>
-                <th>Id</th>
+                <th>No</th>
+                <th>Tanggal</th>
                 <th>Kode</th>
                 <th>Nama</th>
                 <th>Harga</th>
-                <th>Stok Awal</th>
-                <th>Penjualan</th>
-                <th>Stok Akhir</th>
+                <th>Qty</th>
+                <th>Total</th>
             </tr>
         </tfoot>
     </table>
@@ -104,9 +104,9 @@
             });
     });
 
-    function generatePDF(val) {
+    function generatePDF() {
         window.open(
-            '/report/stok/generate-pdf/' + tanggal + '/' + gudang,
+            '/report/penjualan/generate-pdf/' + tanggal + '/' + gudang,
             '_blank'
         )
     }
@@ -114,8 +114,11 @@
     function loadReportStok() {
         var formData = new FormData(document.getElementById('formReportStok'));
         if (formData.get('date') == '')
-            aler('Gagal');
+            alert('Harap Isi Tanggal!');
         else {
+            var generate = document.getElementById("generate");
+            generate.classList.remove("disabled");
+            tanggal = formData.get('date');
             if (formData.get('gudang') == '')
                 gudang = 'null';
             else
@@ -126,9 +129,12 @@
             $('#report').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: '/report/stok/datatables/' + tanggal + '/' + gudang,
+                ajax: '/report/penjualan/datatables/' + tanggal + '/' + gudang,
                 columns: [{
                         data: 'id'
+                    },
+                    {
+                        data: 'tanggal'
                     },
                     {
                         data: 'kode'
@@ -140,17 +146,14 @@
                         data: 'harga'
                     },
                     {
-                        data: 'stok_awal'
+                        data: 'qty'
                     },
                     {
-                        data: 'penjualan'
-                    },
-                    {
-                        data: 'stok_akhir'
+                        data: 'total'
                     }
                 ],
                 columnDefs: [{
-                    target: [3],
+                    target: [4],
                     className: "text-center",
                     render: function(data, type, row) {
                         return fixPrice(data);

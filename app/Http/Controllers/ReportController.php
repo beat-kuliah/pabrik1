@@ -139,4 +139,140 @@ class ReportController extends Controller
 
         return json_encode($response);
     }
+
+    public function penjualanDatatables($tanggal, $gudang, Request $request)
+    {
+        $draw = (int)$request->get('draw');
+        $start = (int)$request->get("start");
+        $rowperpage = (int)$request->get("length"); // Rows display per page
+
+        $columnIndex_arr = $request->get('order');
+        $columnName_arr = $request->get('columns');
+        $order_arr = $request->get('order');
+        $search_arr = $request->get('search');
+
+        $columnIndex = $columnIndex_arr[0]['column']; // Column index
+        $columnName = $columnName_arr[$columnIndex]['data']; // Column name
+        $columnSortOrder = $order_arr[0]['dir']; // asc or desc
+        $searchValue = $search_arr['value']; // Search value
+
+        // Total records
+        $totalRecords = Barang::select('count(*) as allcount')->count();
+        // $searchValue = 'z';
+        // Fetch records
+        if ($gudang != 'null') {
+            $records = Penjualan::orderBy($columnName, $columnSortOrder)
+                ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
+                ->Where('gudang.id', '=', $gudang)
+                ->Where('penjualan.tanggal', '=', $tanggal)
+                ->select('penjualan.*')
+                ->join('barang', 'barang.id', '=', 'penjualan.barang_id')
+                ->join('gudang', 'gudang.id', '=', 'barang.gudang_id')
+                ->skip($start)
+                ->take($rowperpage)
+                ->get();
+        } else {
+            $records = Penjualan::orderBy($columnName, $columnSortOrder)
+                ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
+                ->Where('penjualan.tanggal', '=', $tanggal)
+                ->select('penjualan.*')
+                ->join('barang', 'barang.id', '=', 'penjualan.barang_id')
+                ->skip($start)
+                ->take($rowperpage)
+                ->get();
+        }
+        $totalRecordswithFilter = count($records);
+
+        // return $penjualan;
+        $data_arr = array();
+        $counter = 1;
+        $full = 0;
+        foreach ($records as $record) {
+            $id = $counter;
+            $tanggal = $record->tanggal;
+            $kode = $record->barang->kode;
+            $nama = $record->barang->nama;
+            $harga = $record->barang->harga;
+            $qty = $record->terjual;
+            $total = $record->terjual * $harga;
+
+            $data_arr[] = array(
+                "id" => $id,
+                "tanggal" => $tanggal,
+                "kode" => $kode,
+                "nama" => $nama,
+                "harga" => $harga,
+                "qty" => $qty,
+                "total" => $this->fixPrice($total),
+            );
+            $full += $total;
+            $counter++;
+        }
+
+        $response = array(
+            "draw" => intval($draw),
+            "iTotalRecords" => $totalRecords,
+            "iTotalDisplayRecords" => $totalRecordswithFilter,
+            "aaData" => $data_arr,
+            "full" => $this->fixPrice($full),
+        );
+
+        return json_encode($response);
+    }
+
+    public function penjualanGeneratePDF($tanggal, $gudang)
+    {
+        if ($gudang != 'null') {
+            $records = Penjualan::where('gudang.id', '=', $gudang)
+                ->where('penjualan.tanggal', '=', $tanggal)
+                ->select('penjualan.*')
+                ->join('barang', 'barang.id', '=', 'penjualan.barang_id')
+                ->join('gudang', 'gudang.id', '=', 'barang.gudang_id')
+                ->get();
+        } else {
+            $gudang = 'Semua';
+            $records = Penjualan::where('penjualan.tanggal', '=', $tanggal)
+                ->select('penjualan.*')
+                ->join('barang', 'barang.id', '=', 'penjualan.barang_id')
+                ->get();
+        }
+
+        $counter = 1;
+        $full = 0;
+        foreach ($records as $record) {
+            $id = $counter;
+            $tanggal = $record->tanggal;
+            $kode = $record->barang->kode;
+            $nama = $record->barang->nama;
+            $harga = $record->barang->harga;
+            $qty = $record->terjual;
+            $total = $record->terjual * $harga;
+
+            $data_arr[] = array(
+                "id" => $id,
+                "tanggal" => $tanggal,
+                "kode" => $kode,
+                "nama" => $nama,
+                "harga" => $harga,
+                "qty" => $qty,
+                "total" => $this->fixPrice($total),
+            );
+            $full += $total;
+            $counter++;
+        }
+
+        $data = [
+            'penjualan' => $data_arr,
+            'tanggal' => $this->fixDateOnly($tanggal),
+            'gudang' => $gudang,
+            'dibuat' => date("H:i:s"),
+            'full' => $this->fixPrice($full),
+        ];
+
+        $pdf = Pdf::loadView('pdf.penjualan_report', $data);
+        $pdf->set_paper('letter', 'landscape');
+        $pdf->set_base_path(__DIR__);
+        $pdf->render();
+        return $pdf->stream('invoice.pdf');
+    }
 }

@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="container">
-    <button style="float: right; margin-top: 50px;" type="button" class="btn btn-primary" onclick="generatePDF()">
+    <button style="float: right; margin-top: 50px;" type="button" id="generate" class="btn btn-primary disabled" onclick="generatePDF()">
         Generate PDF
     </button>
     <h1>Report Stok</h1>
@@ -114,8 +114,11 @@
     function loadReportStok() {
         var formData = new FormData(document.getElementById('formReportStok'));
         if (formData.get('date') == '')
-            aler('Gagal');
+            alert('Harap Isi Tanggal!');
         else {
+            var generate = document.getElementById("generate");
+            generate.classList.remove("disabled");
+            tanggal = formData.get('date');
             if (formData.get('gudang') == '')
                 gudang = 'null';
             else
