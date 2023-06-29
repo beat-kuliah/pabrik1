@@ -6,7 +6,7 @@
     <button style="float: right; margin-top: 50px;" type="button" class="btn btn-primary" onclick="generatePDF()">
         Generate PDF
     </button>
-    <h1>Report</h1>
+    <h1>Report Stok</h1>
     <br><br>
 </div>
 <div class="container">
@@ -54,8 +54,6 @@
     </table>
 </div>
 
-@include('penjualan.create')
-
 @endsection
 
 @section('script')
@@ -64,32 +62,18 @@
     var tanggal;
     var gudang;
 
-    axios.get('/gudang/all')
-        .then(function(response) {
-            response.data.forEach(element => {
-                var gudang = document.getElementById("selectGudang");
-                var option = document.createElement("option");
-                option.value = element.id;
-                option.text = element.nama;
-                gudang.add(option);
-            });
-
-        })
-
     $(document).ready(function() {
-        axios.get('/barang/all')
+        axios.get('/gudang/all')
             .then(function(response) {
                 response.data.forEach(element => {
-                    var gudang = document.getElementById("selectBarang");
+                    var gudang = document.getElementById("selectGudang");
                     var option = document.createElement("option");
                     option.value = element.id;
                     option.text = element.nama;
                     gudang.add(option);
                 });
+
             })
-
-
-
     });
 
     function isNumberKeyCheck(evt) {
@@ -130,50 +114,50 @@
     function loadReportStok() {
         var formData = new FormData(document.getElementById('formReportStok'));
         if (formData.get('date') == '')
-            tanggal = 'null';
-        else
-            tanggal = formData.get('date');
-        if (formData.get('gudang') == '')
-            gudang = 'null';
-        else
-            gudang = formData.get('gudang');
-        var reportStok = document.getElementById('report');
-        reportStok.style.display = '';
-        $('#report').dataTable().fnDestroy();
-        $('#report').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: '/report/stok/datatables/' + tanggal + '/' + gudang,
-            columns: [{
-                    data: 'id'
-                },
-                {
-                    data: 'kode'
-                },
-                {
-                    data: 'nama'
-                },
-                {
-                    data: 'harga'
-                },
-                {
-                    data: 'stok_awal'
-                },
-                {
-                    data: 'penjualan'
-                },
-                {
-                    data: 'stok_akhir'
-                }
-            ],
-            columnDefs: [{
-                target: [3],
-                className: "text-center",
-                render: function(data, type, row) {
-                    return fixPrice(data);
-                }
-            }]
-        });
+            aler('Gagal');
+        else {
+            if (formData.get('gudang') == '')
+                gudang = 'null';
+            else
+                gudang = formData.get('gudang');
+            var reportStok = document.getElementById('report');
+            reportStok.style.display = '';
+            $('#report').dataTable().fnDestroy();
+            $('#report').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: '/report/stok/datatables/' + tanggal + '/' + gudang,
+                columns: [{
+                        data: 'id'
+                    },
+                    {
+                        data: 'kode'
+                    },
+                    {
+                        data: 'nama'
+                    },
+                    {
+                        data: 'harga'
+                    },
+                    {
+                        data: 'stok_awal'
+                    },
+                    {
+                        data: 'penjualan'
+                    },
+                    {
+                        data: 'stok_akhir'
+                    }
+                ],
+                columnDefs: [{
+                    target: [3],
+                    className: "text-center",
+                    render: function(data, type, row) {
+                        return fixPrice(data);
+                    }
+                }]
+            });
+        }
     }
 </script>
 

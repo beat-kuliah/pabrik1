@@ -11,14 +11,25 @@ use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
-    public function index()
+    public function indexStok()
     {
         return view('report.stok');
     }
 
+    public function indexAccounting()
+    {
+        return view('report.penjualan');
+    }
+
     public function stokGeneratePDF($tanggal, $gudang)
     {
-        $records = Barang::where('gudang_id', '=', $gudang)->get();
+        if ($gudang != 'null') {
+            $records = Barang::where('gudang_id', '=', $gudang)->get();
+            $gudang = Gudang::find($gudang)->nama;
+        } else {
+            $records = Barang::all();
+            $gudang = 'Semua';
+        }
 
         $data_arr = array();
         foreach ($records as $record) {
@@ -43,8 +54,6 @@ class ReportController extends Controller
                 "action" => $id,
             );
         }
-
-        $gudang = Gudang::find($gudang);
 
         $data = [
             'barang' => $data_arr,

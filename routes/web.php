@@ -82,7 +82,10 @@ Route::controller(BarangController::class)->middleware('auth', 'role:ADMIN')->gr
 });
 
 Route::controller(ReportController::class)->middleware('auth', 'role:ADMIN')->group(function () {
-    Route::get('/report', 'index');
+    Route::get('/report-stok', 'indexStok');
+    Route::get('/report-account', 'indexAccounting');
     Route::get('/report/stok/datatables/{tanggal}/{gudang}', 'stokDatatables');
     Route::get('/report/stok/generate-pdf/{tanggal}/{gudang}', 'stokGeneratePDF');
+    Route::get('/report/penjualan/datatables/{tanggal}/{gudang}', 'penjualanDatatables');
+    Route::get('/report/penjualan/generate-pdf/{tanggal}/{gudang}', 'penjualanGeneratePDF');
 });
