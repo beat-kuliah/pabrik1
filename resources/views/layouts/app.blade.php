@@ -48,6 +48,7 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/user">User</a>
                         </li>
+                        @if (Auth::user()->role[0] == 'ADMIN' || Auth::user()->role[0] == 'STAFF_GUDANG' || Auth::user()->role[0] == 'ADMIN_GUDANG')
                         <li class="nav-item">
                             <a class="nav-link" href="/vendor">Vendor</a>
                         </li>
@@ -60,6 +61,8 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/penjualan">Penjualan</a>
                         </li>
+                        @endif
+                        @if (Auth::user()->role[0] == 'ADMIN' || Auth::user()->role[0] == 'MANAGER' || Auth::user()->role[0] == 'KEUANGAN' || Auth::user()->role[0] == 'PURCHASING')
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Report
@@ -69,6 +72,7 @@
                                 <li><a class="dropdown-item" href="/report-account">Accounting</a></li>
                             </ul>
                         </li>
+                        @endif
                     </ul>
                     @endguest
                     <!-- Right Side Of Navbar -->

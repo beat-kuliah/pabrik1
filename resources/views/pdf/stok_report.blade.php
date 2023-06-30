@@ -40,7 +40,7 @@
         <h1>Stock Report</h1>
     </center>
     <h3>Gudang : {{ $gudang }}</h3>
-    <h3>Tanggal : {{ $tanggal }}</h3>
+    <h3>Tanggal : {{ $from . ' - ' . $to }}</h3>
     <h3>Dibuat : {{ $dibuat }}</h3>
     <table>
         <tr>

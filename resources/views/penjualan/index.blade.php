@@ -8,6 +8,16 @@
     </button>
     <h1>Penjualan</h1>
     <br><br>
+    <form name="formFilter" id="formFilter">
+        <div class="input-group mb-3">
+            <div class="input-group mb-3">
+                <input type="date" name="from" id="from" class="form-control" placeholder="From">
+                <span class="input-group-text">-</span>
+                <input type="date" name="to" id="to" class="form-control" placeholder="To">
+                <button onclick="filtered()" class="btn btn-outline-secondary" type="button" id="button-addon2">Filter</button>
+            </div>
+        </div>
+    </form>
     <table id="penjualan" class="display" style="width:100%">
         <thead>
             <tr>
@@ -275,6 +285,79 @@
             .catch(function(error) {
                 alert('Gagal');
             })
+    }
+
+    function filtered() {
+        var formData = $('#formFilter').serializeArray();
+        if (formData[0].value == '' || formData[1].value == '')
+            alert('Tolong isi tanggal!')
+        else {
+            $('#penjualan').dataTable().fnDestroy();
+            $('#penjualan').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    'url': '/penjualan/datatables',
+                    'data': formData
+                },
+                columns: [{
+                        data: 'id'
+                    },
+                    {
+                        data: 'kode'
+                    },
+                    {
+                        data: 'nama'
+                    },
+                    {
+                        data: 'harga'
+                    },
+                    {
+                        data: 'jumlah'
+                    },
+                    {
+                        data: 'total'
+                    },
+                    {
+                        data: 'tanggal'
+                    },
+                    {
+                        data: 'action'
+                    }
+                ],
+                columnDefs: [{
+                    target: [3],
+                    className: "text-center",
+                    render: function(data, type, row) {
+                        return fixPrice(data);
+                    }
+                }, {
+                    target: [5],
+                    className: "text-center",
+                    render: function(data, type, row) {
+                        return fixPrice(data);
+                    }
+                }, {
+                    target: [6],
+                    className: "text-center",
+                    render: function(data, type, row) {
+                        return fixDateOnly(data);
+                    }
+                }, {
+                    target: [7],
+                    className: "text-center",
+                    render: function(data, type, row) {
+                        var result = '<button type="button" onclick="generatePDF(' + data + ')" class="btn btn-success">PDF</button>';
+                        result += '<span>   </span>';
+                        result += '<button type="button" data-bs-toggle="modal" data-bs-target="#editPenjualan" onclick="editPenjualan(' + data + ')" class="btn btn-warning">Edit</button>';
+                        result += '<span>   </span>';
+                        result += '<button type="button" onclick="deletePenjualan(' + data + ')" class="btn btn-danger">Delete</button>';
+
+                        return result;
+                    }
+                }]
+            });
+        }
     }
 </script>
 

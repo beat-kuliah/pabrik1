@@ -21,7 +21,7 @@ class ReportController extends Controller
         return view('report.penjualan');
     }
 
-    public function stokGeneratePDF($tanggal, $gudang)
+    public function stokGeneratePDF($from, $to, $gudang)
     {
         if ($gudang != 'null') {
             $records = Barang::where('gudang_id', '=', $gudang)->get();
@@ -33,8 +33,8 @@ class ReportController extends Controller
 
         $data_arr = array();
         foreach ($records as $record) {
-            $terjual_akhir = DB::select('select SUM(terjual) as terjual from penjualan where barang_id = ' . $record->id . ' AND tanggal > "' . $tanggal . '"')[0]->terjual;
-            $terjual_proses = (int)DB::select('select SUM(terjual) as terjual from penjualan where barang_id = ' . $record->id . ' AND tanggal = "' . $tanggal . '" AND created_at >= "' . $record->updated_at . '"')[0]->terjual;
+            $terjual_akhir = DB::select('select SUM(terjual) as terjual from penjualan where barang_id = ' . $record->id . ' AND tanggal > "' . $to . '"')[0]->terjual;
+            $terjual_proses = (int)DB::select('select SUM(terjual) as terjual from penjualan where barang_id = ' . $record->id . ' AND tanggal >= "' . $from . '" AND tanggal <= "' . $to . '" AND created_at >= "' . $record->updated_at . '"')[0]->terjual;
             $id = $record->id;
             $kode = $record->kode;
             $nama = $record->nama;
@@ -57,9 +57,10 @@ class ReportController extends Controller
 
         $data = [
             'barang' => $data_arr,
-            'tanggal' => $this->fixDateOnly($tanggal),
+            'from' => $this->fixDateOnly($from),
+            'to' => $this->fixDateOnly($to),
             'gudang' => $gudang,
-            'dibuat' => date("H:i:s"),
+            'dibuat' => $this->fixDateOnly(date('Y-m-d')) . date("H:i:s"),
         ];
 
         $pdf = Pdf::loadView('pdf.stok_report', $data);
@@ -69,8 +70,11 @@ class ReportController extends Controller
         return $pdf->stream('invoice.pdf');
     }
 
-    public function stokDatatables($tanggal, $gudang, Request $request)
+    public function stokDatatables(Request $request)
     {
+        $form = $request[0]['value'];
+        $to = $request[1]['value'];
+        $gudang = $request[2]['value'];
         $draw = (int)$request->get('draw');
         $start = (int)$request->get("start");
         $rowperpage = (int)$request->get("length"); // Rows display per page
@@ -89,7 +93,7 @@ class ReportController extends Controller
         $totalRecords = Barang::select('count(*) as allcount')->count();
         // $searchValue = 'z';
         // Fetch records
-        if ($gudang != 'null') {
+        if ($gudang != '') {
             $records = Barang::orderBy($columnName, $columnSortOrder)
                 ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
                 ->where('barang.gudang_id', '=', $gudang)
@@ -108,8 +112,13 @@ class ReportController extends Controller
         // return $penjualan;
         $data_arr = array();
         foreach ($records as $record) {
-            $terjual_akhir = DB::select('select SUM(terjual) as terjual from penjualan where barang_id = ' . $record->id . ' AND tanggal > "' . $tanggal . '"')[0]->terjual;
-            $terjual_proses = (int)DB::select('select SUM(terjual) as terjual from penjualan where barang_id = ' . $record->id . ' AND tanggal = "' . $tanggal . '" AND created_at >= "' . $record->updated_at . '"')[0]->terjual;
+            $terjual_akhir = DB::select('select SUM(terjual) as terjual from penjualan where barang_id = ' . $record->id . ' AND tanggal > "' . $form . '" AND tanggal = "' . $to . '"')[0]->terjual;
+            $terjual_proses = 'select SUM(terjual) as terjual from penjualan where barang_id = ' . $record->id . ' AND created_at >= "' . $record->updated_at . '"';
+            if ($form != '')
+                $terjual_proses .= ' AND tanggal >= "' . $form . '"';
+            if ($to != '')
+                $terjual_proses .= ' AND tanggal <= "' . $to . '"';
+            $terjual_proses = (int)DB::select($terjual_proses)[0]->terjual;
             $id = $record->id;
             $kode = $record->kode;
             $nama = $record->nama;
@@ -140,8 +149,11 @@ class ReportController extends Controller
         return json_encode($response);
     }
 
-    public function penjualanDatatables($tanggal, $gudang, Request $request)
+    public function penjualanDatatables(Request $request)
     {
+        $from = $request[0]['value'];
+        $to = $request[1]['value'];
+        $gudang = $request[2]['value'];
         $draw = (int)$request->get('draw');
         $start = (int)$request->get("start");
         $rowperpage = (int)$request->get("length"); // Rows display per page
@@ -160,11 +172,11 @@ class ReportController extends Controller
         $totalRecords = Barang::select('count(*) as allcount')->count();
         // $searchValue = 'z';
         // Fetch records
-        if ($gudang != 'null') {
+        if ($gudang != '') {
             $records = Penjualan::orderBy($columnName, $columnSortOrder)
                 ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
                 ->Where('gudang.id', '=', $gudang)
-                ->Where('penjualan.tanggal', '=', $tanggal)
+                ->whereBetween('penjualan.tanggal', [$from, $to])
                 ->select('penjualan.*')
                 ->join('barang', 'barang.id', '=', 'penjualan.barang_id')
                 ->join('gudang', 'gudang.id', '=', 'barang.gudang_id')
@@ -174,7 +186,7 @@ class ReportController extends Controller
         } else {
             $records = Penjualan::orderBy($columnName, $columnSortOrder)
                 ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
-                ->Where('penjualan.tanggal', '=', $tanggal)
+                ->whereBetween('penjualan.tanggal', [$from, $to])
                 ->select('penjualan.*')
                 ->join('barang', 'barang.id', '=', 'penjualan.barang_id')
                 ->skip($start)
@@ -220,23 +232,24 @@ class ReportController extends Controller
         return json_encode($response);
     }
 
-    public function penjualanGeneratePDF($tanggal, $gudang)
+    public function penjualanGeneratePDF($from, $to, $gudang)
     {
         if ($gudang != 'null') {
             $records = Penjualan::where('gudang.id', '=', $gudang)
-                ->where('penjualan.tanggal', '=', $tanggal)
+                ->whereBetween('penjualan.tanggal', [$from, $to])
                 ->select('penjualan.*')
                 ->join('barang', 'barang.id', '=', 'penjualan.barang_id')
                 ->join('gudang', 'gudang.id', '=', 'barang.gudang_id')
                 ->get();
         } else {
             $gudang = 'Semua';
-            $records = Penjualan::where('penjualan.tanggal', '=', $tanggal)
+            $records = Penjualan::whereBetween('penjualan.tanggal', [$from, $to])
                 ->select('penjualan.*')
                 ->join('barang', 'barang.id', '=', 'penjualan.barang_id')
                 ->get();
         }
 
+        $data_arr = array();
         $counter = 1;
         $full = 0;
         foreach ($records as $record) {
@@ -263,9 +276,9 @@ class ReportController extends Controller
 
         $data = [
             'penjualan' => $data_arr,
-            'tanggal' => $this->fixDateOnly($tanggal),
+            'tanggal' => $this->fixDateOnly($from) . ' - ' . $this->fixDateOnly($to),
             'gudang' => $gudang,
-            'dibuat' => date("H:i:s"),
+            'dibuat' => $this->fixDateOnly(date('Y/m/d')) . ' ' . date("H:i:s"),
             'full' => $this->fixPrice($full),
         ];
 

@@ -3,9 +3,11 @@
 @section('content')
 
 <div class="container">
+    @if (Auth::user()->role[0] == 'ADMIN')
     <button style="float: right; margin-top: 50px;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUser">
         Tambah Data
     </button>
+    @endif
     <h1>User</h1>
     <br><br>
     <div class="table-responsive">
@@ -73,7 +75,7 @@
                     target: [5],
                     className: "text-center",
                     render: function(data, type, row) {
-                        return '<button type="button" data-bs-toggle="modal" data-bs-target="#updateRole" onclick="updateRole(' + data + ')" class="btn btn-warning">role</button><span>   </span><button type="button" onclick="deleteUser(' + data + ')" class="btn btn-danger">Delete</button>';
+                        return '@if (Auth::user()->role[0] == "ADMIN")<button type="button" data-bs-toggle="modal" data-bs-target="#updateRole" onclick="updateRole(' + data + ')" class="btn btn-warning">role</button><span>   </span><button type="button" onclick="deleteUser(' + data + ')" class="btn btn-danger">Delete</button>@else noAccess @endif';
                     }
                 },
                 {

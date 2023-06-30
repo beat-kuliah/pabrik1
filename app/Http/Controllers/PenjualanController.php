@@ -139,14 +139,27 @@ class PenjualanController extends Controller
         $totalRecords = Penjualan::select('count(*) as allcount')->count();
 
         // Fetch records
-        $records = Penjualan::orderBy($columnName, $columnSortOrder)
-            ->where('barang.nama', 'like', '%' . $searchValue . '%')
-            ->orWhere('barang.kode', 'like', '%' . $searchValue . '%')
-            ->select('penjualan.*')
-            ->join('barang', 'barang.id', '=', 'penjualan.barang_id')
-            ->skip($start)
-            ->take($rowperpage)
-            ->get();
+        if (!isset($request[0]['value'])) {
+            $records = Penjualan::orderBy($columnName, $columnSortOrder)
+                ->where('barang.nama', 'like', '%' . $searchValue . '%')
+                ->orWhere('barang.kode', 'like', '%' . $searchValue . '%')
+                ->select('penjualan.*')
+                ->join('barang', 'barang.id', '=', 'penjualan.barang_id')
+                ->skip($start)
+                ->take($rowperpage)
+                ->get();
+        } else {
+            $from = $request[0]['value'];
+            $to  = $request[1]['value'];
+            $records = Penjualan::orderBy($columnName, $columnSortOrder)
+                ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
+                ->whereBetween('penjualan.tanggal', [$from, $to])
+                ->select('penjualan.*')
+                ->join('barang', 'barang.id', '=', 'penjualan.barang_id')
+                ->skip($start)
+                ->take($rowperpage)
+                ->get();
+        }
         $totalRecordswithFilter = count($records);
 
         // return $records;

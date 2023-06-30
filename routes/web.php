@@ -29,7 +29,7 @@ Auth::routes();
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-Route::controller(UserController::class)->middleware('auth', 'role:ADMIN')->group(function () {
+Route::controller(UserController::class)->middleware('auth')->group(function () {
     Route::get('/user', 'index')->name('user');
     Route::post('/user', 'store');
     Route::get('/user/show/{id}', 'show');
@@ -40,7 +40,7 @@ Route::controller(UserController::class)->middleware('auth', 'role:ADMIN')->grou
     Route::get('/role', 'role');
 });
 
-Route::controller(GudangController::class)->middleware('auth', 'role:ADMIN')->group(function () {
+Route::controller(GudangController::class)->middleware('auth')->group(function () {
     Route::get('/gudang', 'index')->name('gudang');
     Route::post('/gudang', 'store');
     Route::get('/gudang/show/{id}', 'show');
@@ -50,7 +50,7 @@ Route::controller(GudangController::class)->middleware('auth', 'role:ADMIN')->gr
     Route::get('/gudang/all', 'getAll');
 });
 
-Route::controller(VendorController::class)->middleware('auth', 'role:ADMIN')->group(function () {
+Route::controller(VendorController::class)->middleware('auth')->group(function () {
     Route::get('/vendor', 'index')->name('vendor');
     Route::get('/vendor/show/{id}', 'show');
     Route::get('/vendor/datatables', 'datatables');
@@ -60,7 +60,7 @@ Route::controller(VendorController::class)->middleware('auth', 'role:ADMIN')->gr
     Route::post('/vendor/update/{id}', 'update');
 });
 
-Route::controller(PenjualanController::class)->middleware('auth', 'role:ADMIN')->group(function () {
+Route::controller(PenjualanController::class)->middleware('auth')->group(function () {
     Route::get('/penjualan', 'index')->name('penjualan');
     Route::post('/penjualan', 'store');
     Route::post('/penjualan/update/{id}', 'update');
@@ -70,7 +70,7 @@ Route::controller(PenjualanController::class)->middleware('auth', 'role:ADMIN')-
     Route::get('/penjualan/generate-pdf/{id}', 'generatePDF');
 });
 
-Route::controller(BarangController::class)->middleware('auth', 'role:ADMIN')->group(function () {
+Route::controller(BarangController::class)->middleware('auth')->group(function () {
     Route::get('/barang', 'index')->name('barang');
     Route::get('/barang/find/{id}', 'findOne');
     Route::get('/barang/all', 'getAll');
@@ -81,11 +81,11 @@ Route::controller(BarangController::class)->middleware('auth', 'role:ADMIN')->gr
     Route::post('/barang/update/{id}', 'update');
 });
 
-Route::controller(ReportController::class)->middleware('auth', 'role:ADMIN')->group(function () {
+Route::controller(ReportController::class)->middleware('auth')->group(function () {
     Route::get('/report-stok', 'indexStok');
     Route::get('/report-account', 'indexAccounting');
-    Route::get('/report/stok/datatables/{tanggal}/{gudang}', 'stokDatatables');
-    Route::get('/report/stok/generate-pdf/{tanggal}/{gudang}', 'stokGeneratePDF');
-    Route::get('/report/penjualan/datatables/{tanggal}/{gudang}', 'penjualanDatatables');
-    Route::get('/report/penjualan/generate-pdf/{tanggal}/{gudang}', 'penjualanGeneratePDF');
+    Route::get('/report/stok/datatables', 'stokDatatables');
+    Route::get('/report/stok/generate-pdf/{from}/{to}/{gudang}', 'stokGeneratePDF');
+    Route::get('/report/penjualan/datatables', 'penjualanDatatables');
+    Route::get('/report/penjualan/generate-pdf/{from}/{to}/{gudang}', 'penjualanGeneratePDF');
 });
