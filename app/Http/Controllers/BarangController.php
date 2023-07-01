@@ -70,7 +70,7 @@ class BarangController extends Controller
         $barang->kode = $request->kode_barang;
         $barang->nama = $request->nama;
         $barang->harga = $request->harga;
-        $barang->gudang_id = $request->vendor;
+        $barang->gudang_id = 1;
         $barang->save();
 
         return 200;
