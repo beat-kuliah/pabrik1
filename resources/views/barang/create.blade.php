@@ -32,14 +32,6 @@
                             <input type="text" onkeypress="return isNumberKey(event)" name="stok" class="form-control" required>
                         </div>
                     </div>
-                    <div class="mb-3 row">
-                        <label class="col-sm-2 col-form-label">Gudang</label>
-                        <div class="col-sm-10">
-                            <select name="gudang" class="form-select" id="selectGudang">
-                                <option value="" disabled selected>Select Gudang</option>
-                            </select>
-                        </div>
-                    </div>
                 </form>
             </div>
             <div class="modal-footer">

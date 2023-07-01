@@ -97,30 +97,6 @@
                 }
             }, ]
         });
-
-        axios.get('/gudang/all')
-            .then(function(response) {
-                response.data.forEach(element => {
-                    var gudang = document.getElementById("selectGudang");
-                    var option = document.createElement("option");
-                    option.value = element.id;
-                    option.text = element.nama;
-                    gudang.add(option);
-                });
-
-            })
-
-        axios.get('/gudang/all')
-            .then(function(response) {
-                response.data.forEach(element => {
-                    var editGudang = document.getElementById("selectEditGudang");
-                    var option = document.createElement("option");
-                    option.value = element.id;
-                    option.text = element.nama;
-                    editGudang.add(option);
-                });
-
-            })
     });
 
     $('#selectGudangFilter').change(function() {

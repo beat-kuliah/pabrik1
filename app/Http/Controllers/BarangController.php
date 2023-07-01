@@ -35,7 +35,16 @@ class BarangController extends Controller
             $barang->stok_awal = $request->stok;
             $barang->stok_akhir = $request->stok;
             $barang->harga  = $request->harga;
-            $barang->gudang_id = $request->gudang;
+            $barang->gudang_id = 1;
+            $barang->save();
+
+            $barang = new Barang();
+            $barang->kode = $request->kode_barang;
+            $barang->nama = $request->nama;
+            $barang->stok_awal = 0;
+            $barang->stok_akhir = 0;
+            $barang->harga  = $request->harga;
+            $barang->gudang_id = 2;
             $barang->save();
 
             $status = 200;
@@ -126,7 +135,7 @@ class BarangController extends Controller
         $searchRole = $columnName_arr[4]['search']['value'];
 
         // Total records
-        $totalRecords = Barang::select('count(*) as allcount')->count();
+        $totalRecords = Barang::select('count(*) as allcount')->count() / 2;
 
         // Fetch records
         if (isset($request->gudangFilter)) {
@@ -138,8 +147,8 @@ class BarangController extends Controller
                 ->get();
         } else {
             $records = Barang::orderBy($columnName, $columnSortOrder)
-                ->where('barang.nama', 'like', '%' . $searchValue . '%')
-                ->orWhere('barang.kode', 'like', '%' . $searchValue . '%')
+                ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
+                ->where('barang.gudang_id', '=', 1)
                 ->skip($start)
                 ->take($rowperpage)
                 ->get();
@@ -149,7 +158,7 @@ class BarangController extends Controller
             ->where('barang.nama', 'like', '%' . $searchValue . '%')
             ->orWhere('barang.kode', 'like', '%' . $searchValue . '%')
             ->get();
-        $totalRecordswithFilter = count($check);
+        $totalRecordswithFilter = count($check) / 2;
 
         // dd($records);
         $data_arr = array();
