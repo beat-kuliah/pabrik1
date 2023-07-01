@@ -128,7 +128,7 @@
             }]
         });
 
-        axios.get('/barang/all')
+        axios.get('/barang/all/2')
             .then(function(response) {
                 response.data.forEach(element => {
                     var gudang = document.getElementById("selectBarang");
@@ -139,7 +139,7 @@
                 });
             })
 
-        axios.get('/barang/all')
+        axios.get('/barang/all/2')
             .then(function(response) {
                 response.data.forEach(element => {
                     var gudang = document.getElementById("selectEditBarang");

@@ -74,6 +74,7 @@ Route::controller(BarangController::class)->middleware('auth')->group(function (
     Route::get('/barang', 'index')->name('barang');
     Route::get('/barang/find/{id}', 'findOne');
     Route::get('/barang/all', 'getAll');
+    Route::get('/barang/all/{gudang}', 'getAllGudang');
     Route::get('/barang/datatables', 'datatables');
     Route::get('/barang/destroy/{id}', 'destroy');
     Route::post('/barang/update-stok/{id}', 'updateStok');

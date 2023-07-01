@@ -101,6 +101,13 @@ class BarangController extends Controller
         return $barang;
     }
 
+    public function getAllGudang($gudang)
+    {
+        $barang = Barang::where('gudang_id', '=', 2)->get();
+
+        return $barang;
+    }
+
     public function datatables(Request $request)
     {
         $draw = (int)$request->get('draw');
