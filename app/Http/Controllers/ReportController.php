@@ -100,14 +100,23 @@ class ReportController extends Controller
                 ->skip($start)
                 ->take($rowperpage)
                 ->get();
+
+            $chcek = Barang::orderBy($columnName, $columnSortOrder)
+                ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
+                ->where('barang.gudang_id', '=', $gudang)
+                ->get();
         } else {
             $records = Barang::orderBy($columnName, $columnSortOrder)
                 ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
                 ->skip($start)
                 ->take($rowperpage)
                 ->get();
+
+            $check = Barang::orderBy($columnName, $columnSortOrder)
+                ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
+                ->get();
         }
-        $totalRecordswithFilter = count($records);
+        $totalRecordswithFilter = count($check);
 
         // return $penjualan;
         $data_arr = array();
@@ -183,6 +192,15 @@ class ReportController extends Controller
                 ->skip($start)
                 ->take($rowperpage)
                 ->get();
+
+            $check = Penjualan::orderBy($columnName, $columnSortOrder)
+                ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
+                ->Where('gudang.id', '=', $gudang)
+                ->whereBetween('penjualan.tanggal', [$from, $to])
+                ->select('penjualan.*')
+                ->join('barang', 'barang.id', '=', 'penjualan.barang_id')
+                ->join('gudang', 'gudang.id', '=', 'barang.gudang_id')
+                ->get();
         } else {
             $records = Penjualan::orderBy($columnName, $columnSortOrder)
                 ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
@@ -192,8 +210,15 @@ class ReportController extends Controller
                 ->skip($start)
                 ->take($rowperpage)
                 ->get();
+
+            $check = Penjualan::orderBy($columnName, $columnSortOrder)
+                ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
+                ->whereBetween('penjualan.tanggal', [$from, $to])
+                ->select('penjualan.*')
+                ->join('barang', 'barang.id', '=', 'penjualan.barang_id')
+                ->get();
         }
-        $totalRecordswithFilter = count($records);
+        $totalRecordswithFilter = count($check);
 
         // return $penjualan;
         $data_arr = array();

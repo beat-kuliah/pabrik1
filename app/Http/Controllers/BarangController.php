@@ -70,6 +70,11 @@ class BarangController extends Controller
     public function updateStok($id, Request $request)
     {
         $barang = Barang::find($id);
+        if ($barang->gudang_id == 2) {
+            $barangUtama = Barang::where('gudang_id', '=', 1)->where('kode', '=', $barang->kode)->first();
+            $barangUtama->stok_akhir = $barangUtama->stok_awal - $request->stok;
+            $barangUtama->save();
+        }
         $stok = $barang->stok_akhir + $request->stok;
         $barang->stok_awal = $stok;
         $barang->stok_akhir = $stok;
@@ -117,13 +122,27 @@ class BarangController extends Controller
         $totalRecords = Barang::select('count(*) as allcount')->count();
 
         // Fetch records
-        $records = Barang::orderBy($columnName, $columnSortOrder)
+        if (isset($request->gudangFilter)) {
+            $records = Barang::orderBy($columnName, $columnSortOrder)
+                ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
+                ->where('barang.gudang_id', '=', $request->gudangFilter)
+                ->skip($start)
+                ->take($rowperpage)
+                ->get();
+        } else {
+            $records = Barang::orderBy($columnName, $columnSortOrder)
+                ->where('barang.nama', 'like', '%' . $searchValue . '%')
+                ->orWhere('barang.kode', 'like', '%' . $searchValue . '%')
+                ->skip($start)
+                ->take($rowperpage)
+                ->get();
+        }
+
+        $check = Barang::orderBy($columnName, $columnSortOrder)
             ->where('barang.nama', 'like', '%' . $searchValue . '%')
             ->orWhere('barang.kode', 'like', '%' . $searchValue . '%')
-            ->skip($start)
-            ->take($rowperpage)
             ->get();
-        $totalRecordswithFilter = count($records);
+        $totalRecordswithFilter = count($check);
 
         // dd($records);
         $data_arr = array();

@@ -148,6 +148,13 @@ class PenjualanController extends Controller
                 ->skip($start)
                 ->take($rowperpage)
                 ->get();
+
+            $check = Penjualan::orderBy($columnName, $columnSortOrder)
+                ->where('barang.nama', 'like', '%' . $searchValue . '%')
+                ->orWhere('barang.kode', 'like', '%' . $searchValue . '%')
+                ->select('penjualan.*')
+                ->join('barang', 'barang.id', '=', 'penjualan.barang_id')
+                ->get();
         } else {
             $from = $request[0]['value'];
             $to  = $request[1]['value'];
@@ -159,8 +166,15 @@ class PenjualanController extends Controller
                 ->skip($start)
                 ->take($rowperpage)
                 ->get();
+
+            $check = Penjualan::orderBy($columnName, $columnSortOrder)
+                ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
+                ->whereBetween('penjualan.tanggal', [$from, $to])
+                ->select('penjualan.*')
+                ->join('barang', 'barang.id', '=', 'penjualan.barang_id')
+                ->get();
         }
-        $totalRecordswithFilter = count($records);
+        $totalRecordswithFilter = count($check);
 
         // return $records;
         $data_arr = array();

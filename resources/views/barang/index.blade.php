@@ -8,6 +8,11 @@
     </button>
     <h1>Barang</h1>
     <br><br>
+    <select class="form-select" id="selectGudangFilter" aria-label="Default select example">
+        <option value="1" selected>Gudang Utama</option>
+        <option value="2">Gudang Siap Jual</option>
+    </select>
+    <br>
     <div class="table-responsive">
         <table id="barang" class="display" style="width:100%">
             <thead>
@@ -116,6 +121,68 @@
                 });
 
             })
+    });
+
+    $('#selectGudangFilter').change(function() {
+        var data = $(this).val();
+        $('#barang').dataTable().fnDestroy();
+        $('#barang').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                'url': '/barang/datatables',
+                'data': {
+                    'gudangFilter': data,
+                }
+            },
+            columns: [{
+                    data: 'id'
+                },
+                {
+                    data: 'kode'
+                },
+                {
+                    data: 'nama'
+                },
+                {
+                    data: 'stock_awal'
+                },
+                {
+                    data: 'stock_akhir'
+                },
+                {
+                    data: 'harga'
+                },
+                {
+                    data: 'vendor'
+                },
+                {
+                    data: 'gudang'
+                },
+                {
+                    data: 'action'
+                }
+            ],
+            columnDefs: [{
+                target: [5],
+                className: "text-center",
+                render: function(data, type, row) {
+                    return fixPrice(data);
+                }
+            }, {
+                target: [8],
+                className: "text-center",
+                render: function(data, type, row) {
+                    var act = '<button type="button" data-bs-toggle="modal" data-bs-target="#editBarang" onclick="editBarang(' + data + ')" class="btn btn-warning">Edit</button>';
+                    act += '<span>   </span>';
+                    act += '<button type="button" onclick="formUpdateStok(' + data + ')" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#updateStok">Stok</button>';
+                    act += '<span>   </span>';
+                    act += '<button type="button" onclick="deleteBarang(' + data + ')" class="btn btn-danger">Delete</button>';
+
+                    return act;
+                }
+            }, ]
+        });
     });
 
     function formUpdateStok(val) {
