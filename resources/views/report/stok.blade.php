@@ -25,7 +25,8 @@
             <label class="col-sm-2 col-form-label">Gudang</label>
             <div class="col-sm-10">
                 <select name="gudang" class="form-select" id="selectGudang">
-                    <option value="" selected>Select Gudang</option>
+                    <option value="1" selected>Gudang Utama</option>
+                    <option value="2">Gudang Siap Jual</option>
                 </select>
             </div>
         </div>
@@ -67,19 +68,7 @@
     var to;
     var gudang;
 
-    $(document).ready(function() {
-        axios.get('/gudang/all')
-            .then(function(response) {
-                response.data.forEach(element => {
-                    var gudang = document.getElementById("selectGudang");
-                    var option = document.createElement("option");
-                    option.value = element.id;
-                    option.text = element.nama;
-                    gudang.add(option);
-                });
-
-            })
-    });
+    $(document).ready(function() {});
 
     function isNumberKeyCheck(evt) {
         var charCode = (evt.which) ? evt.which : evt.keyCode

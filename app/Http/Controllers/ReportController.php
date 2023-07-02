@@ -72,7 +72,7 @@ class ReportController extends Controller
 
     public function stokDatatables(Request $request)
     {
-        $form = $request[0]['value'];
+        $from = $request[0]['value'];
         $to = $request[1]['value'];
         $gudang = $request[2]['value'];
         $draw = (int)$request->get('draw');
@@ -93,49 +93,47 @@ class ReportController extends Controller
         $totalRecords = Barang::select('count(*) as allcount')->count();
         // $searchValue = 'z';
         // Fetch records
-        if ($gudang != '') {
-            $records = Barang::orderBy($columnName, $columnSortOrder)
-                ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
-                ->where('barang.gudang_id', '=', $gudang)
-                ->skip($start)
-                ->take($rowperpage)
-                ->get();
+        $records = Barang::orderBy($columnName, $columnSortOrder)
+            ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
+            ->where('barang.gudang_id', '=', $gudang)
+            ->skip($start)
+            ->take($rowperpage)
+            ->get();
 
-            $chcek = Barang::orderBy($columnName, $columnSortOrder)
-                ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
-                ->where('barang.gudang_id', '=', $gudang)
-                ->get();
-        } else {
-            $records = Barang::orderBy($columnName, $columnSortOrder)
-                ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
-                ->skip($start)
-                ->take($rowperpage)
-                ->get();
-
-            $check = Barang::orderBy($columnName, $columnSortOrder)
-                ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
-                ->get();
-        }
+        $check = Barang::orderBy($columnName, $columnSortOrder)
+            ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
+            ->where('barang.gudang_id', '=', $gudang)
+            ->get();
         $totalRecordswithFilter = count($check);
 
         // return $penjualan;
         $data_arr = array();
         foreach ($records as $record) {
-            $terjual_akhir = DB::select('select SUM(terjual) as terjual from penjualan where barang_id = ' . $record->id . ' AND tanggal > "' . $form . '" AND tanggal = "' . $to . '"')[0]->terjual;
+            $terjual_akhir = DB::select('select SUM(terjual) as terjual from penjualan where barang_id = ' . $record->id . ' AND tanggal > "' . $from . '" AND tanggal = "' . $to . '"')[0]->terjual;
             $terjual_proses = 'select SUM(terjual) as terjual from penjualan where barang_id = ' . $record->id . ' AND created_at >= "' . $record->updated_at . '"';
-            if ($form != '')
-                $terjual_proses .= ' AND tanggal >= "' . $form . '"';
+            if ($from != '')
+                $terjual_proses .= ' AND tanggal >= "' . $from . '"';
             if ($to != '')
                 $terjual_proses .= ' AND tanggal <= "' . $to . '"';
             $terjual_proses = (int)DB::select($terjual_proses)[0]->terjual;
+            if ($terjual_akhir == null)
+                $terjual_akhir = 0;
+            if ($terjual_proses == null)
+                $terjual_proses = 0;
+
             $id = $record->id;
             $kode = $record->kode;
             $nama = $record->nama;
             $harga = $record->harga;
-            $stok_akhir = $record->stok_akhir + $terjual_akhir;
-            $stok_awal = $stok_akhir + $terjual_proses;
-            $penjualan = $terjual_proses;
-
+            if ($gudang == 1) {
+                $stok_akhir = $record->stok_akhir;
+                $stok_awal = $record->stok_awal;
+                $penjualan = $record->stok_awal - $record->stok_akhir;
+            } else {
+                $stok_akhir = $record->stok_akhir + $terjual_akhir;
+                $stok_awal = $stok_akhir + $terjual_proses;
+                $penjualan = $terjual_proses;
+            }
             $data_arr[] = array(
                 "id" => $id,
                 "kode" => $kode,

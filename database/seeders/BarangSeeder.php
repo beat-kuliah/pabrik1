@@ -225,6 +225,7 @@ class BarangSeeder extends Seeder
             'gudang_id' => 2
         ]];
 
-        Barang::insert($data);
+        foreach ($data as $d)
+            Barang::create($d);
     }
 }
