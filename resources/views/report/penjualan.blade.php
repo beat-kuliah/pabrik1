@@ -21,14 +21,6 @@
                 </div>
             </div>
         </div>
-        <div class="mb-3 row">
-            <label class="col-sm-2 col-form-label">Gudang</label>
-            <div class="col-sm-10">
-                <select name="gudang" class="form-select" id="selectGudang">
-                    <option value="" selected>Select Gudang</option>
-                </select>
-            </div>
-        </div>
     </form>
     <button onclick="loadReportStok()" class="btn btn-outline-secondary float-end" type="button" id="button-addon2">Filter</button>
     <br><br>
@@ -66,19 +58,7 @@
     var tanggal;
     var gudang;
 
-    $(document).ready(function() {
-        axios.get('/gudang/all')
-            .then(function(response) {
-                response.data.forEach(element => {
-                    var gudang = document.getElementById("selectGudang");
-                    var option = document.createElement("option");
-                    option.value = element.id;
-                    option.text = element.nama;
-                    gudang.add(option);
-                });
-
-            })
-    });
+    $(document).ready(function() {});
 
     function isNumberKeyCheck(evt) {
         var charCode = (evt.which) ? evt.which : evt.keyCode
@@ -88,29 +68,9 @@
         return true;
     }
 
-    $('#terjual').keyup(function(event) {
-        terjual = $('#terjual').val();
-        if (terjual >= stok_max)
-            document.getElementById("terjual").value = stok_max;
-        var total = $('#terjual').val() * harga;
-        document.getElementById("total").value = fixPrice(total);
-    });
-
-    $('#selectBarang').change(function() {
-        var data = $(this).val();
-        axios.get('/barang/find/' + data)
-            .then(function(response) {
-                document.getElementById("nama").value = response.data.nama;
-                document.getElementById("harga").value = fixPrice(response.data.harga);
-                document.getElementById("stok").value = response.data.stok_akhir;
-                harga = response.data.harga;
-                stok_max = response.data.stok_akhir;
-            });
-    });
-
     function generatePDF() {
         window.open(
-            '/report/penjualan/generate-pdf/' + from + '/' + to + '/' + gudang,
+            '/report/penjualan/generate-pdf/' + from + '/' + to + '/' + 2,
             '_blank'
         )
     }
@@ -129,10 +89,6 @@
                 generate.classList.remove("disabled");
                 from = formData[0].value;
                 to = formData[1].value;
-                if (formData[2].value == '')
-                    gudang = 'null';
-                else
-                    gudang = formData[2].value;
                 var reportStok = document.getElementById('report');
                 reportStok.style.display = '';
                 $('#report').dataTable().fnDestroy();

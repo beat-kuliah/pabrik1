@@ -57,7 +57,11 @@
                 <h3>Stok Awal</h3>
             </th>
             <th>
+                @if($gudang == 'Gudang Utama')
+                <h3>Terpindah</h3>
+                @else
                 <h3>Terjual</h3>
+                @endif
             </th>
             <th>
                 <h3>Stok Akhir</h3>

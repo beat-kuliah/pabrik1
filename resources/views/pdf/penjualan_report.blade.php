@@ -15,7 +15,7 @@
 
     th,
     td {
-        width: 150px;
+        width: 128px;
         text-align: center;
     }
 
@@ -39,13 +39,15 @@
     <center>
         <h1>Penjualan Report</h1>
     </center>
-    <h3>Gudang : {{ $gudang }}</h3>
     <h3>Tanggal : {{ $tanggal }}</h3>
     <h3>Dibuat : {{ $dibuat }}</h3>
     <table>
         <tr>
             <th>
                 <h3>No</h3>
+            </th>
+            <th>
+                <h3>Tanggal</h3>
             </th>
             <th>
                 <h3>Kode</h3>
@@ -69,6 +71,9 @@
                 <h3>{{ $p['id'] }}</h3>
             </td>
             <td>
+                <h3>{{ $p['tanggal'] }}</h3>
+            </td>
+            <td>
                 <h3>{{ $p['kode'] }}</h3>
             </td>
             <td>
@@ -90,6 +95,9 @@
     <hr>
     <table>
         <tr>
+            <td>
+                <h3></h3>
+            </td>
             <td>
                 <h3></h3>
             </td>

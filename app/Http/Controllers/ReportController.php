@@ -39,9 +39,15 @@ class ReportController extends Controller
             $kode = $record->kode;
             $nama = $record->nama;
             $harga = $record->harga;
-            $stok_akhir = $record->stok_akhir + $terjual_akhir;
-            $stok_awal = $stok_akhir + $terjual_proses;
-            $penjualan = $terjual_proses;
+            if ($gudang == 'Gudang Utama') {
+                $stok_akhir = $record->stok_akhir;
+                $stok_awal = $record->stok_awal;
+                $penjualan = $record->stok_awal - $record->stok_akhir;
+            } else {
+                $stok_akhir = $record->stok_akhir + $terjual_akhir;
+                $stok_awal = $stok_akhir + $terjual_proses;
+                $penjualan = $terjual_proses;
+            }
 
             $data_arr[] = array(
                 "id" => $id,
@@ -160,7 +166,6 @@ class ReportController extends Controller
     {
         $from = $request[0]['value'];
         $to = $request[1]['value'];
-        $gudang = $request[2]['value'];
         $draw = (int)$request->get('draw');
         $start = (int)$request->get("start");
         $rowperpage = (int)$request->get("length"); // Rows display per page
@@ -176,46 +181,28 @@ class ReportController extends Controller
         $searchValue = $search_arr['value']; // Search value
 
         // Total records
-        $totalRecords = Barang::select('count(*) as allcount')->count();
+        $totalRecords = Penjualan::select('count(*) as allcount')->count();
         // $searchValue = 'z';
         // Fetch records
-        if ($gudang != '') {
-            $records = Penjualan::orderBy($columnName, $columnSortOrder)
-                ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
-                ->Where('gudang.id', '=', $gudang)
-                ->whereBetween('penjualan.tanggal', [$from, $to])
-                ->select('penjualan.*')
-                ->join('barang', 'barang.id', '=', 'penjualan.barang_id')
-                ->join('gudang', 'gudang.id', '=', 'barang.gudang_id')
-                ->skip($start)
-                ->take($rowperpage)
-                ->get();
+        $records = Penjualan::orderBy($columnName, $columnSortOrder)
+            ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
+            ->Where('gudang.id', '=', 2)
+            ->whereBetween('penjualan.tanggal', [$from, $to])
+            ->select('penjualan.*')
+            ->join('barang', 'barang.id', '=', 'penjualan.barang_id')
+            ->join('gudang', 'gudang.id', '=', 'barang.gudang_id')
+            ->skip($start)
+            ->take($rowperpage)
+            ->get();
 
-            $check = Penjualan::orderBy($columnName, $columnSortOrder)
-                ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
-                ->Where('gudang.id', '=', $gudang)
-                ->whereBetween('penjualan.tanggal', [$from, $to])
-                ->select('penjualan.*')
-                ->join('barang', 'barang.id', '=', 'penjualan.barang_id')
-                ->join('gudang', 'gudang.id', '=', 'barang.gudang_id')
-                ->get();
-        } else {
-            $records = Penjualan::orderBy($columnName, $columnSortOrder)
-                ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
-                ->whereBetween('penjualan.tanggal', [$from, $to])
-                ->select('penjualan.*')
-                ->join('barang', 'barang.id', '=', 'penjualan.barang_id')
-                ->skip($start)
-                ->take($rowperpage)
-                ->get();
-
-            $check = Penjualan::orderBy($columnName, $columnSortOrder)
-                ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
-                ->whereBetween('penjualan.tanggal', [$from, $to])
-                ->select('penjualan.*')
-                ->join('barang', 'barang.id', '=', 'penjualan.barang_id')
-                ->get();
-        }
+        $check = Penjualan::orderBy($columnName, $columnSortOrder)
+            ->where([['barang.nama', 'like', '%' . $searchValue . '%'], ['barang.kode', 'like', '%' . $searchValue . '%']])
+            ->Where('gudang.id', '=', 2)
+            ->whereBetween('penjualan.tanggal', [$from, $to])
+            ->select('penjualan.*')
+            ->join('barang', 'barang.id', '=', 'penjualan.barang_id')
+            ->join('gudang', 'gudang.id', '=', 'barang.gudang_id')
+            ->get();
         $totalRecordswithFilter = count($check);
 
         // return $penjualan;
@@ -257,27 +244,19 @@ class ReportController extends Controller
 
     public function penjualanGeneratePDF($from, $to, $gudang)
     {
-        if ($gudang != 'null') {
-            $records = Penjualan::where('gudang.id', '=', $gudang)
-                ->whereBetween('penjualan.tanggal', [$from, $to])
-                ->select('penjualan.*')
-                ->join('barang', 'barang.id', '=', 'penjualan.barang_id')
-                ->join('gudang', 'gudang.id', '=', 'barang.gudang_id')
-                ->get();
-        } else {
-            $gudang = 'Semua';
-            $records = Penjualan::whereBetween('penjualan.tanggal', [$from, $to])
-                ->select('penjualan.*')
-                ->join('barang', 'barang.id', '=', 'penjualan.barang_id')
-                ->get();
-        }
+        $records = Penjualan::where('gudang.id', '=', $gudang)
+            ->whereBetween('penjualan.tanggal', [$from, $to])
+            ->select('penjualan.*')
+            ->join('barang', 'barang.id', '=', 'penjualan.barang_id')
+            ->join('gudang', 'gudang.id', '=', 'barang.gudang_id')
+            ->get();
 
         $data_arr = array();
         $counter = 1;
         $full = 0;
         foreach ($records as $record) {
             $id = $counter;
-            $tanggal = $record->tanggal;
+            $tanggal = $this->fixDateOnly($record->tanggal);
             $kode = $record->barang->kode;
             $nama = $record->barang->nama;
             $harga = $record->barang->harga;
