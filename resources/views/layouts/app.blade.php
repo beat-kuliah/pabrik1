@@ -69,7 +69,7 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="/report-stok">Stok</a></li>
-                                <li><a class="dropdown-item" href="/report-account">Accounting</a></li>
+                                <li><a class="dropdown-item" href="/report-account">Penjualan</a></li>
                             </ul>
                         </li>
                         @endif
