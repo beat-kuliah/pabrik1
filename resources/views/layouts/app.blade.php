@@ -61,6 +61,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/penjualan">Penjualan</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/retur">Retur</a>
+                        </li>
                         @endif
                         @if (Auth::user()->role[0] == 'ADMIN' || Auth::user()->role[0] == 'MANAGER' || Auth::user()->role[0] == 'KEUANGAN' || Auth::user()->role[0] == 'PURCHASING')
                         <li class="nav-item dropdown">

@@ -5,6 +5,7 @@ use App\Http\Controllers\GudangController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PenjualanController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ReturController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VendorController;
 use Illuminate\Support\Facades\Auth;
@@ -89,4 +90,14 @@ Route::controller(ReportController::class)->middleware('auth')->group(function (
     Route::get('/report/stok/generate-pdf/{from}/{to}/{gudang}', 'stokGeneratePDF');
     Route::get('/report/penjualan/datatables', 'penjualanDatatables');
     Route::get('/report/penjualan/generate-pdf/{from}/{to}/{gudang}', 'penjualanGeneratePDF');
+});
+
+Route::controller(ReturController::class)->middleware('auth')->group(function () {
+    Route::get('/retur', 'index');
+    Route::get('/retur/penjualan/{id}', 'showPenjualan');
+    Route::get('/retur/show/{id}', 'show');
+    Route::get('/retur/datatables', 'datatables');
+    Route::post('/retur/update/{id}', 'update');
+    Route::post('/retur', 'store');
+    Route::delete('/retur/{id}', 'destroy');
 });
