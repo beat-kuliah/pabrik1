@@ -100,39 +100,41 @@
 
             var barangId = document.getElementById('barangId').value;
             penjualanId = barangId;
-            var temp;
             axios.get('/retur/penjualan/' + barangId).then((response) => {
-                temp = response.data;
+                dataAdded(response.data, barangId);
             }).catch((err) => {
                 console.log(err);
             });
-            if (temp == '') {
-                axios.get('/penjualan/show/' + barangId).then((response) => {
-                    if (response.data == '') {
-                        alert('Penjualan tidak ada');
-                        check = false;
-                        maxStok = 0;
-                        maxRetur = 0;
-                        document.getElementById('dataBarang').style.display = 'none';
-                        document.getElementById("jmlretur").value = maks;
-                    } else {
-                        console.log(response.data);
-                        maxRetur = response.data.terjual;
-                        document.getElementById('jumlah').value = response.data.terjual;
-                        checkBarang(response.data.barang_id);
-                        document.getElementById('dataBarang').style.display = 'block';
-                        check = true;
-                    }
-                }).catch((err) => {
-                    console.log(err);
-                });
-            } else {
-                alert('Penjualan ini sudah diretur');
-            }
 
             return false;
         })
     });
+
+    function dataAdded(temp, barangId) {
+        if (temp == '') {
+            axios.get('/penjualan/show/' + barangId).then((response) => {
+                if (response.data == '') {
+                    alert('Penjualan tidak ada');
+                    check = false;
+                    maxStok = 0;
+                    maxRetur = 0;
+                    document.getElementById('dataBarang').style.display = 'none';
+                    document.getElementById("jmlretur").value = maks;
+                } else {
+                    console.log(response.data);
+                    maxRetur = response.data.terjual;
+                    document.getElementById('jumlah').value = response.data.terjual;
+                    checkBarang(response.data.barang_id);
+                    document.getElementById('dataBarang').style.display = 'block';
+                    check = true;
+                }
+            }).catch((err) => {
+                console.log(err);
+            });
+        } else {
+            alert('Penjualan ini sudah diretur');
+        }
+    }
 
     function checkBarang(kodeBarang) {
         axios.get('/barang/find/' + kodeBarang).then((response) => {
